@@ -22,6 +22,7 @@ import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.gui.DialogErrorHandler;
 import com.unicornlabs.kabouter.gui.GuiManager;
 import com.unicornlabs.kabouter.gui.SplashScreen;
+import com.unicornlabs.kabouter.historian.Historian;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,9 +72,11 @@ public class KabouterServerMain {
                     + KabouterConstants.KABOUTER_SERVER_PROPERTIES);
             ConfigManager theConfigManager = new ConfigManager(myPropertiesStream);
 
-            //Start the module manager and register it in the BOM
-            mySplashScreen.addText("Starting Module Manager");
-
+            mySplashScreen.addText("Starting Historian Service");
+            Historian theHistorian = new Historian();
+            BusinessObjectManager.registerBusinessObject(Historian.class.getName(), theHistorian);
+            
+            //Finished loading all components
             mySplashScreen.fade();
 
             //Start the GUI Manager in the Swing Initializer Thread
@@ -103,7 +106,8 @@ public class KabouterServerMain {
      */
     public static void configureLogging() throws IOException {
         //Read the logging config file
-        InputStream loggingProperties = KabouterServerMain.class.getResourceAsStream(KabouterConstants.CONFIG_PATH + KabouterConstants.LOGGING_PROPERTIES);
+        String propertiesPath = KabouterConstants.CONFIG_PATH + KabouterConstants.LOGGING_PROPERTIES;
+        InputStream loggingProperties = KabouterServerMain.class.getResourceAsStream(propertiesPath);
         LogManager.getLogManager().readConfiguration(loggingProperties);
 
         Logger rootLogger = Logger.getLogger("");
