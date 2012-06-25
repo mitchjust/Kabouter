@@ -212,6 +212,20 @@ public class Historian {
     }
     
     /**
+     * Saves a list of power logs
+     * @param thePowerlog the log to save
+     */
+    public void savePowerlogs(ArrayList<Powerlog> thePowerlogs) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        for(Powerlog log : thePowerlogs) {
+            session.save(log);
+        }
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    /**
      * Updates a power log
      * @param thePowerlog the log to update
      */

@@ -19,9 +19,12 @@ import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -30,6 +33,12 @@ import javax.swing.JOptionPane;
  */
 public class DebugPanel extends javax.swing.JPanel {
 
+    private static final Logger LOGGER = Logger.getLogger(DebugPanel.class.getName());
+
+    static {
+        LOGGER.setLevel(Level.ALL);
+    }
+    
     /**
      * Creates new form DebugPanel
      */
@@ -142,21 +151,22 @@ public class DebugPanel extends javax.swing.JPanel {
             Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
             Calendar theCalendar = Calendar.getInstance();
             
-            Random r = new Random();
+            Random r = new Random(); 
+            ArrayList<Powerlog> powerlogs = new ArrayList<Powerlog>();
             
-            PowerlogId id = new PowerlogId();
-            Powerlog log = new Powerlog(id);
+            LOGGER.info("Generating Logs...");
             
             for(int i=0;i<entries;i++) {
-                double d = r.nextDouble()*1000;
-                id.setDeviceid(deviceId);
-                id.setLogtime(theCalendar.getTime());
-                log.setPower(d);
-                
-                theHistorian.savePowerlog(log);
-                
+                double d = 1000+r.nextDouble()*100;
+                PowerlogId id = new PowerlogId(theCalendar.getTime(), deviceId);
+                Powerlog log = new Powerlog(id, d);
+                powerlogs.add(log);
                 theCalendar.add(Calendar.SECOND, -1);
             }
+            
+            LOGGER.info("Sending Logs To Historian");
+            
+            theHistorian.savePowerlogs(powerlogs);
             
             JOptionPane.showMessageDialog(this, "Added " + entries + " new entries","Complete",JOptionPane.INFORMATION_MESSAGE);
             
