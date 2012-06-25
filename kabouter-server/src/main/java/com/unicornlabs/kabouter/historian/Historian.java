@@ -18,13 +18,18 @@
 package com.unicornlabs.kabouter.historian;
 
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
+import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Settings;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.impl.SessionFactoryImpl;
 
 /**
@@ -90,7 +95,7 @@ public class Historian {
     public Device getDevice(String deviceId) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
-        List result = session.createQuery("from Device as device device.id ='" + deviceId + "'").list();
+        List result = session.createQuery("from Device as device where device.id ='" + deviceId + "'").list();
         session.getTransaction().commit();
         session.close();
         if (result.isEmpty()) {
@@ -141,6 +146,77 @@ public class Historian {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
         session.update(theDevice);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    /**
+     * Deletes a device
+     * @param theDevice the device to be deleted
+     */
+    public void deleteDevice(Device theDevice) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.delete(theDevice);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public ArrayList<Powerlog> getPowerlogs(String deviceId) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '"+deviceId+"'").list();
+        session.getTransaction().commit();
+        session.close();
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return (ArrayList)result;
+    } 
+    
+    public ArrayList<Powerlog> getPowerlogs(String deviceId, Date from, Date to) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "' " +
+                "and powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
+        session.getTransaction().commit();
+        session.close();
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return (ArrayList)result;
+    }
+    
+    public void savePowerlog(Powerlog thePowerlog) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.save(thePowerlog);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public void updatePowerlog(Powerlog thePowerlog) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.update(thePowerlog);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public void deletePowerlog(Powerlog thePowerlog) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.delete(thePowerlog);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public void deletePowerLogs(String deviceId) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.createQuery("delete from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "'").executeUpdate();
         session.getTransaction().commit();
         session.close();
     }

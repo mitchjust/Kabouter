@@ -7,9 +7,8 @@
     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/kabouter</property>
     <property name="hibernate.connection.username">kabouter</property>
     <property name="hibernate.connection.password">kabouter</property>
-    <property name="hibernate.show_sql">true</property>
     <property name="hibernate.current_session_context_class">thread</property>
-    <property name="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</property>
+    <property name="hibernate.show_sql">true</property>
     <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Device.hbm.xml"/>
     <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Powerlog.hbm.xml"/>
   </session-factory>
