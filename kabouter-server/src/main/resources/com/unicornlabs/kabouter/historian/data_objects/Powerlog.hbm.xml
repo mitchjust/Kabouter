@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 25/06/2012 2:06:16 PM by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="com.unicornlabs.kabouter.historian.data_objects.Powerlog" table="powerlog" schema="kabouterserver">
+        <composite-id name="id" class="com.unicornlabs.kabouter.historian.data_objects.PowerlogId">
+            <key-property name="logtime" type="timestamp">
+                <column name="logtime" length="29" />
+            </key-property>
+            <key-property name="deviceid" type="string">
+                <column name="deviceid" />
+            </key-property>
+        </composite-id>
+        <property name="power" type="java.lang.Double">
+            <column name="power" precision="17" scale="17" />
+        </property>
+    </class>
+</hibernate-mapping>

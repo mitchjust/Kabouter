@@ -11,9 +11,20 @@
     <repositories>
         <repository>
             <url>http://download.java.net/maven/2/</url>
-            <id>hibernate-support</id>
+            <id>Java Repo</id>
             <layout>default</layout>
             <name>Repository for library Library[hibernate-support]</name>
+        </repository>
+        <repository>
+            <url>http://repo1.maven.org/maven2/</url>
+            <id>Maven Repo</id>
+            <layout>default</layout>
+            <name>Repository for library Library[hibernate-support]</name>
+        </repository>
+        <repository>
+            <id>unknown-jars-temp-repo</id>
+            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+            <url>file:${project.basedir}/lib</url>
         </repository>
     </repositories>
     <dependencies>
@@ -49,10 +60,17 @@
             <version>1.0.1.GA</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.8.2.2</version>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
         </dependency>
-            
     </dependencies>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
 </project>
