@@ -48,7 +48,7 @@ public class SplashScreen extends javax.swing.JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/unicornlabs/kabouter/gui/splash.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/unicornlabs/kabouter/gui/images/splash.png"))); // NOI18N
 
         splashTextArea.setColumns(20);
         splashTextArea.setRows(5);

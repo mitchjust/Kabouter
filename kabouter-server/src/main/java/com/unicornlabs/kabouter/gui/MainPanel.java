@@ -46,7 +46,7 @@ public class MainPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1024, 768));
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/unicornlabs/kabouter/gui/splash.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/unicornlabs/kabouter/gui/images/splash.png"))); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Calibri", 1, 36)); // NOI18N
         jLabel2.setText("Kabouter Server");
@@ -69,7 +69,7 @@ public class MainPanel extends javax.swing.JPanel {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addContainerGap(439, Short.MAX_VALUE))
+                .addContainerGap(457, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
