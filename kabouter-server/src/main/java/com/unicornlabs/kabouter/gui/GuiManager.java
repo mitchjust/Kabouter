@@ -19,6 +19,8 @@ package com.unicornlabs.kabouter.gui;
 
 import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.gui.debug.DebugPanel;
+import com.unicornlabs.kabouter.gui.power.PowerPanel;
+import java.awt.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
@@ -35,14 +37,13 @@ import javax.swing.event.ChangeListener;
 public class GuiManager implements ChangeListener {
 
     private static final Logger LOGGER = Logger.getLogger(GuiManager.class.getName());
-    public static final int HOME_TAB_INDEX = 0;
-    public static final int MODULE_TAB_INDEX = 1;
 
     static {
         LOGGER.setLevel(Level.ALL);
     }
     private MainFrame myMainFrame;
     private MainPanel myMainPanel;
+    private PowerPanel myPowerPanel;
     private DebugPanel myDebugPanel;
 
     public GuiManager() {
@@ -53,9 +54,12 @@ public class GuiManager implements ChangeListener {
 
         myMainPanel = new MainPanel();
         
+        myPowerPanel = new PowerPanel();
+        
         myDebugPanel = new DebugPanel();
 
         myMainFrame.addTabbedPanel("Home", myMainPanel);
+        myMainFrame.addTabbedPanel("Power Logs", myPowerPanel);
         myMainFrame.addTabbedPanel("Debug", myDebugPanel);
 
     }
@@ -68,13 +72,17 @@ public class GuiManager implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         JTabbedPane pane = (JTabbedPane) e.getSource();
-        switch (pane.getSelectedIndex()) {
-            case HOME_TAB_INDEX:
-                break;
-            case MODULE_TAB_INDEX:
-                break;
-            default:
-                LOGGER.severe("Switched To Unknown Tab!");
+        Component selectedComponent = pane.getSelectedComponent();
+        
+        if(selectedComponent == myMainPanel) {
+            LOGGER.info("Tab changed to Main Panel");
+        }
+        else if (selectedComponent == myPowerPanel) {
+            LOGGER.info("Tab changed to Power Panel");
+            myPowerPanel.updateDeviceList();
+        }
+        else if (selectedComponent == myDebugPanel) {
+            LOGGER.info("Tab changed to Debug Panel");
         }
     }
 }
