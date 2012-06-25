@@ -125,21 +125,6 @@ public class SplashScreen extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea splashTextArea;
     // End of variables declaration//GEN-END:variables
-
-    /**
-     * fade away the splash and finally dispose of it
-     */
-    public void fade() {
-        for(float opacity = 1f; opacity > 0; opacity -=0.01) {
-            try {
-                this.setOpacity(opacity);
-                Thread.sleep(15);
-            } catch (InterruptedException ex) {
-                
-            }
-        }
-        this.dispose();
-    }
     
     /**
      * Adds text to the message box
