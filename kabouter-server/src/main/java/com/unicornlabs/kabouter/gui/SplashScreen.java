@@ -131,7 +131,7 @@ public class SplashScreen extends javax.swing.JFrame {
      * @param text 
      */
     public void addText(String text) {
-        splashTextArea.append(text + "\n");
+        splashTextArea.append(text);
         splashTextArea.setCaretPosition(splashTextArea.getDocument().getLength());
     }
 }

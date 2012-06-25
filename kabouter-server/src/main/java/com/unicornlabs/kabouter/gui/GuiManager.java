@@ -18,6 +18,7 @@
 package com.unicornlabs.kabouter.gui;
 
 import com.unicornlabs.kabouter.config.KabouterConstants;
+import com.unicornlabs.kabouter.gui.debug.DebugPanel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
@@ -42,6 +43,7 @@ public class GuiManager implements ChangeListener {
     }
     private MainFrame myMainFrame;
     private MainPanel myMainPanel;
+    private DebugPanel myDebugPanel;
 
     public GuiManager() {
 
@@ -50,8 +52,11 @@ public class GuiManager implements ChangeListener {
         myMainFrame.setTitle(KabouterConstants.FRAME_TITLE);
 
         myMainPanel = new MainPanel();
+        
+        myDebugPanel = new DebugPanel();
 
         myMainFrame.addTabbedPanel("Home", myMainPanel);
+        myMainFrame.addTabbedPanel("Debug", myDebugPanel);
 
     }
 
