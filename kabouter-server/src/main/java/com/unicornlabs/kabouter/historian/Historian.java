@@ -246,4 +246,21 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
+    
+    /**
+     * Returns the unique device ids in the power logs table
+     * @return the list of device ids
+     */
+    public ArrayList<String> getPowerLogDeviceIds() {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List result = session.createQuery("select distinct powerlog.id.deviceid from Powerlog powerlog").list();
+        session.getTransaction().commit();
+        session.close();
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return (ArrayList)result;
+    }
 }
