@@ -21,7 +21,7 @@
             <column name="numio" />
         </property>
         <property name="ionames" type="com.unicornlabs.kabouter.historian.ListAsSQLArrayUserType$STRING">
-            <column name="ionames" />
+            <column name="ionames" sql-type="text[]" />
         </property>
         <property name="displayname" type="string">
             <column name="displayname" />
