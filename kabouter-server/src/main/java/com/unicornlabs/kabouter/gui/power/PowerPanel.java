@@ -37,6 +37,8 @@ public class PowerPanel extends javax.swing.JPanel {
     }
     
     public void updateDeviceList() {
+        deviceComboBox.removeAllItems();
+        
         Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         ArrayList<String> powerLogDeviceIds = theHistorian.getPowerLogDeviceIds();
         
