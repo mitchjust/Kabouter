@@ -77,7 +77,7 @@ public class KabouterServerMain {
             BusinessObjectManager.registerBusinessObject(Historian.class.getName(), theHistorian);
             
             //Finished loading all components
-            mySplashScreen.fade();
+            mySplashScreen.dispose();
 
             //Start the GUI Manager in the Swing Initializer Thread
             mySplashScreen.addText("Starting GUI Manager");
