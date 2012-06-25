@@ -19,7 +19,7 @@ package com.unicornlabs.kabouter;
 
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
-import com.unicornlabs.kabouter.gui.DialogErrorHandler;
+import com.unicornlabs.kabouter.gui.debug.DialogErrorHandler;
 import com.unicornlabs.kabouter.gui.GuiManager;
 import com.unicornlabs.kabouter.gui.SplashScreen;
 import com.unicornlabs.kabouter.historian.Historian;
@@ -60,27 +60,30 @@ public class KabouterServerMain {
 
         try {
             //Do inital config
-            mySplashScreen.addText("Starting Logging Service");
+            mySplashScreen.addText("Starting Logging Service...");
             KabouterServerMain.setupAppDirectory();
             KabouterServerMain.configureLogging();
-
+            mySplashScreen.addText("Done!\n");
+            
             //Setup the Config Manager
-            mySplashScreen.addText("Reading Kabouter Config");
+            mySplashScreen.addText("Reading Kabouter Config...");
             InputStream myPropertiesStream =
                     KabouterServerMain.class.getResourceAsStream(
                     KabouterConstants.CONFIG_PATH
                     + KabouterConstants.KABOUTER_SERVER_PROPERTIES);
             ConfigManager theConfigManager = new ConfigManager(myPropertiesStream);
+            mySplashScreen.addText("Done!\n");
 
-            mySplashScreen.addText("Starting Historian Service");
+            mySplashScreen.addText("Starting Historian Service...");
             Historian theHistorian = new Historian();
             BusinessObjectManager.registerBusinessObject(Historian.class.getName(), theHistorian);
-            
-            //Finished loading all components
-            mySplashScreen.dispose();
+            mySplashScreen.addText("Done!\n");
 
             //Start the GUI Manager in the Swing Initializer Thread
-            mySplashScreen.addText("Starting GUI Manager");
+            mySplashScreen.addText("Starting GUI Manager...");
+
+            //Finished loading all components
+            mySplashScreen.dispose();
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -90,8 +93,6 @@ public class KabouterServerMain {
                     theGuiManager.initalize();
                 }
             });
-
-
 
         } catch (IOException ex) {
             mySplashScreen.addText("Exception In Startup: " + ex);
