@@ -19,17 +19,14 @@ package com.unicornlabs.kabouter.historian;
 
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
-import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Settings;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.impl.SessionFactoryImpl;
 
 /**
@@ -51,6 +48,7 @@ public class Historian {
     private static SessionFactory SESSIONFACTORY;
     
     //syncronization lock
+    //TODO Probably not necessary, HibernateUtil is thread-safe
     private static final Object HISTORIANLOCK = new Object();
     
     /**
@@ -162,6 +160,11 @@ public class Historian {
         session.close();
     }
     
+    /**
+     * Returns the power logs for a device id
+     * @param deviceId the device id
+     * @return ArrayList of logs
+     */
     public ArrayList<Powerlog> getPowerlogs(String deviceId) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
@@ -175,6 +178,13 @@ public class Historian {
         return (ArrayList)result;
     } 
     
+    /**
+     * Returns the power logs for a device id between two dates
+     * @param deviceId the device id
+     * @param from the first date
+     * @param to the last date
+     * @return ArrayList of logs
+     */
     public ArrayList<Powerlog> getPowerlogs(String deviceId, Date from, Date to) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
@@ -189,6 +199,10 @@ public class Historian {
         return (ArrayList)result;
     }
     
+    /**
+     * Saves a new power log
+     * @param thePowerlog the log to save
+     */
     public void savePowerlog(Powerlog thePowerlog) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
@@ -197,6 +211,10 @@ public class Historian {
         session.close();
     }
     
+    /**
+     * Updates a power log
+     * @param thePowerlog the log to update
+     */
     public void updatePowerlog(Powerlog thePowerlog) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
@@ -205,6 +223,10 @@ public class Historian {
         session.close();
     }
     
+    /**
+     * Deletes a specified power log
+     * @param thePowerlog the power log to delete
+     */
     public void deletePowerlog(Powerlog thePowerlog) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
@@ -213,6 +235,10 @@ public class Historian {
         session.close();
     }
     
+    /**
+     * Deletes all logs for a device id
+     * @param deviceId the device id
+     */
     public void deletePowerLogs(String deviceId) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
