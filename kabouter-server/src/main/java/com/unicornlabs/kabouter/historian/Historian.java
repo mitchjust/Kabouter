@@ -200,6 +200,25 @@ public class Historian {
     }
     
     /**
+     * Returns all power logs from all devices between a date range
+     * @param from the start date
+     * @param to the end date
+     * @return the list of power logs
+     */
+    public ArrayList<Powerlog> getPowerlogs(Date from, Date to) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
+        session.getTransaction().commit();
+        session.close();
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return (ArrayList)result;
+    }
+    
+    /**
      * Saves a new power log
      * @param thePowerlog the log to save
      */
