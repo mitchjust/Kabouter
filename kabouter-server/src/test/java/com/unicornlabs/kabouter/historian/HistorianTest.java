@@ -174,6 +174,6 @@ public class HistorianTest extends TestCase {
         myHistorian.deletePowerLogs(testId);
         ArrayList<Powerlog> test3 = myHistorian.getPowerlogs(testId);
         
-        assertNull(test3);
+        assertTrue(test3.isEmpty());
     }
 }

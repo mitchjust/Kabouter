@@ -193,7 +193,6 @@ public class PowerPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deviceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deviceComboBoxActionPerformed
-
     }//GEN-LAST:event_deviceComboBoxActionPerformed
 
     private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
@@ -228,12 +227,12 @@ public class PowerPanel extends javax.swing.JPanel {
         cal.set(Calendar.SECOND, sec);
 
         Date end = cal.getTime();
-        
+
         System.out.println("start = " + start);
         System.out.println("end = " + end);
-        
+
         String graphfocus = (String) deviceComboBox.getSelectedItem();
-        
+
         updateChart(graphfocus, start, end);
 
         setCursor(Cursor.getDefaultCursor());
@@ -267,15 +266,11 @@ public class PowerPanel extends javax.swing.JPanel {
         LOGGER.log(Level.INFO, "Obtaining all power logs for {0}", focus);
         powerlogs = theHistorian.getPowerlogs(focus, start, end);
 
-
-        if (powerlogs == null) {
-            LOGGER.log(Level.INFO, "No logs returned.");
-        } else {
-            LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
-            for (Powerlog p : powerlogs) {
-                powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
-            }
+        LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
+        for (Powerlog p : powerlogs) {
+            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
         }
+
 
         LOGGER.log(Level.INFO, "Added {0} Data Items", powerSeries.getItemCount());
 
