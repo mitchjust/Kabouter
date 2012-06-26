@@ -18,6 +18,7 @@
 package com.unicornlabs.kabouter.gui;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
+import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 
@@ -39,6 +40,10 @@ public class MainFrame extends javax.swing.JFrame {
     
     public void addTabbedPanel(String title, JPanel newPane) {
         jTabbedPane1.addTab(title, newPane);
+    }
+    
+    public Component getCurrentTab() {
+        return jTabbedPane1.getSelectedComponent();
     }
 
     /**
