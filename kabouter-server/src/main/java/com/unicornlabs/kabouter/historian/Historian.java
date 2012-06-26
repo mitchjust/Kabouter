@@ -117,9 +117,6 @@ public class Historian {
         List result = session.createQuery("from Device as device").list();
         session.getTransaction().commit();
         session.close();
-        if (result.isEmpty()) {
-            return null;
-        }
 
         return (ArrayList)result;
     }
@@ -171,9 +168,6 @@ public class Historian {
         List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '"+deviceId+"'").list();
         session.getTransaction().commit();
         session.close();
-        if (result.isEmpty()) {
-            return null;
-        }
 
         return (ArrayList)result;
     } 
@@ -192,9 +186,6 @@ public class Historian {
                 "and powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
         session.getTransaction().commit();
         session.close();
-        if (result.isEmpty()) {
-            return null;
-        }
 
         return (ArrayList)result;
     }
@@ -211,9 +202,6 @@ public class Historian {
         List result = session.createQuery("from Powerlog as powerlog where powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
         session.getTransaction().commit();
         session.close();
-        if (result.isEmpty()) {
-            return null;
-        }
 
         return (ArrayList)result;
     }
@@ -290,9 +278,6 @@ public class Historian {
         List result = session.createQuery("select distinct powerlog.id.deviceid from Powerlog powerlog").list();
         session.getTransaction().commit();
         session.close();
-        if (result.isEmpty()) {
-            return null;
-        }
 
         return (ArrayList)result;
     }
