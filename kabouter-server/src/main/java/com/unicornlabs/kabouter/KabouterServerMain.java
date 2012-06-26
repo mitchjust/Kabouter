@@ -19,13 +19,18 @@ package com.unicornlabs.kabouter;
 
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
+import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.gui.debug.DialogErrorHandler;
 import com.unicornlabs.kabouter.gui.GuiManager;
 import com.unicornlabs.kabouter.gui.SplashScreen;
 import com.unicornlabs.kabouter.historian.Historian;
+import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -59,12 +64,7 @@ public class KabouterServerMain {
         mySplashScreen.addText("Starting Kabouter Server...");
 
         try {
-            //Do inital config
-            mySplashScreen.addText("Starting Logging Service...");
-            KabouterServerMain.setupAppDirectory();
-            KabouterServerMain.configureLogging();
-            mySplashScreen.addText("Done!\n");
-            
+
             //Setup the Config Manager
             mySplashScreen.addText("Reading Kabouter Config...");
             InputStream myPropertiesStream =
@@ -77,6 +77,11 @@ public class KabouterServerMain {
             mySplashScreen.addText("Starting Historian Service...");
             Historian theHistorian = new Historian();
             BusinessObjectManager.registerBusinessObject(Historian.class.getName(), theHistorian);
+            mySplashScreen.addText("Done!\n");
+
+            mySplashScreen.addText("Starting Device Manager Service...");
+            DeviceManager theDeviceManager = new DeviceManager();
+            BusinessObjectManager.registerBusinessObject(DeviceManager.class.getName(), theDeviceManager);
             mySplashScreen.addText("Done!\n");
 
             //Start the GUI Manager in the Swing Initializer Thread
