@@ -8,6 +8,7 @@
         <property name="hibernate.connection.username">kabouter</property>
         <property name="hibernate.connection.password">kabouter</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.show_sql">true</property>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Device.hbm.xml"/>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Powerlog.hbm.xml"/>
         
