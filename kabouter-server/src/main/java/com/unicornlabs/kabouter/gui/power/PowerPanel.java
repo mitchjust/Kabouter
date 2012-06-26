@@ -158,6 +158,7 @@ public class PowerPanel extends javax.swing.JPanel {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    //TODO fix this to actually work - Consider live case
     public void updateChart(String focus) {
         Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         ArrayList<Powerlog> powerlogs;
@@ -171,23 +172,23 @@ public class PowerPanel extends javax.swing.JPanel {
         powerSeries = new XYSeries("First");
         dataset = new XYSeriesCollection(powerSeries);
 
-
         LOGGER.log(Level.INFO, "Obtaining all power logs for {0}", focus);
         powerlogs = theHistorian.getPowerlogs(focus, yesterday, currentDate);
-        
-        
-        if(powerlogs == null) {
-            return;
+
+
+        if (powerlogs == null) {
+            LOGGER.log(Level.INFO, "No logs returned.");
+        } else {
+            LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
+            for (Powerlog p : powerlogs) {
+                powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
+            }
         }
-        LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
-        for (Powerlog p : powerlogs) {
-            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
-        }
-        
-        LOGGER.info("Added " + powerSeries.getItemCount() + " Data Items");
+
+        LOGGER.log(Level.INFO, "Added {0} Data Items", powerSeries.getItemCount());
 
         myChart = ChartFactory.createXYLineChart("Power Usage", "Date", "Power", dataset, PlotOrientation.VERTICAL, true, true, true);
-        
-        ((ChartPanel)chartPanel).setChart(myChart);
+
+        ((ChartPanel) chartPanel).setChart(myChart);
     }
 }
