@@ -17,13 +17,20 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.gui;
 
+import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
+import com.unicornlabs.kabouter.devices.DeviceInfo;
+import com.unicornlabs.kabouter.devices.DeviceManager;
+import com.unicornlabs.kabouter.devices.events.DeviceEvent;
+import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.gui.debug.DebugPanel;
 import com.unicornlabs.kabouter.gui.power.PowerPanel;
+import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.awt.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -34,55 +41,105 @@ import javax.swing.event.ChangeListener;
  *
  * Description: Handles GUI functions
  */
-public class GuiManager implements ChangeListener {
+public class GuiManager implements ChangeListener, DeviceEventListener {
 
     private static final Logger LOGGER = Logger.getLogger(GuiManager.class.getName());
 
     static {
         LOGGER.setLevel(Level.ALL);
     }
+    private DeviceManager theDeviceManager;
     private MainFrame myMainFrame;
     private MainPanel myMainPanel;
     private PowerPanel myPowerPanel;
     private DebugPanel myDebugPanel;
 
+    /**
+     * Obtain business objects and setup gui objects
+     */
     public GuiManager() {
 
+        //Get device mangaer
+        theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+
+        //Setup main frame
         myMainFrame = new MainFrame();
         myMainFrame.setLocationRelativeTo(null);
         myMainFrame.setTitle(KabouterConstants.FRAME_TITLE);
 
+        //Setup panels
         myMainPanel = new MainPanel();
-        
+
         myPowerPanel = new PowerPanel();
-        
+
         myDebugPanel = new DebugPanel();
 
+        //Add panels as tabs
         myMainFrame.addTabbedPanel("Home", myMainPanel);
         myMainFrame.addTabbedPanel("Power Logs", myPowerPanel);
         myMainFrame.addTabbedPanel("Debug", myDebugPanel);
 
     }
 
+    /**
+     * Attach to event sources
+     */
     public void initalize() {
         myMainFrame.addTabbedPaneChangeListener(this);
         myMainFrame.setVisible(true);
+        theDeviceManager.addDeviceEventListener(this);
     }
 
+    /**
+     * Indicates that the selected tab has changed
+     * @param e 
+     */
     @Override
     public void stateChanged(ChangeEvent e) {
         JTabbedPane pane = (JTabbedPane) e.getSource();
+
         Component selectedComponent = pane.getSelectedComponent();
-        
-        if(selectedComponent == myMainPanel) {
+
+        if (selectedComponent == myMainPanel) {
             LOGGER.info("Tab changed to Main Panel");
-        }
-        else if (selectedComponent == myPowerPanel) {
+        } else if (selectedComponent == myPowerPanel) {
             LOGGER.info("Tab changed to Power Panel");
             myPowerPanel.updateDeviceList();
-        }
-        else if (selectedComponent == myDebugPanel) {
+        } else if (selectedComponent == myDebugPanel) {
             LOGGER.info("Tab changed to Debug Panel");
         }
+    }
+
+    /**
+     * Performs an action based on event type and selected pane in the swing
+     * thread
+     *
+     * @param e the event
+     */
+    @Override
+    public void handleDeviceEvent(final DeviceEvent e) {
+
+        //Only execute gui operations in the swing thread
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+
+                final DeviceInfo theDeviceInfo = (DeviceInfo) e.getSource();
+
+                if (e.getEventType().equals(DeviceEvent.NEW_DEVICE_EVENT)) {
+                    
+                } 
+                else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
+                    //Actions for New Power Logs
+                    if (myMainFrame.getCurrentTab() == myPowerPanel) {
+                        //Action for power panel
+                        Powerlog newLog = (Powerlog) e.getAttachment();
+                        myPowerPanel.handleNewPowerLog(newLog);
+                    }
+                }
+            }
+        });
+
     }
 }
