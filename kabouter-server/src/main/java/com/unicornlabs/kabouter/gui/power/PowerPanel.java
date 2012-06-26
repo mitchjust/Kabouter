@@ -17,9 +17,20 @@ package com.unicornlabs.kabouter.gui.power;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.historian.Historian;
+import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -27,28 +38,46 @@ import org.jfree.chart.JFreeChart;
  */
 public class PowerPanel extends javax.swing.JPanel {
 
-    JFreeChart myChart;
-    
+    private static final Logger LOGGER = Logger.getLogger(PowerPanel.class.getName());
+    private static final int MAX_DATA_POINTS = 1000;
+
+    static {
+        LOGGER.setLevel(Level.ALL);
+    }
+    public static final String TOTAL_POWER = "Total";
+
     /**
      * Creates new form PowerPanel
      */
     public PowerPanel() {
         initComponents();
     }
-    
+    private JFreeChart myChart;
+    private XYSeries powerSeries;
+    private XYSeriesCollection dataset;
+
     public void updateDeviceList() {
+        deviceComboBox.setEnabled(false);
         deviceComboBox.removeAllItems();
-        
+
+        deviceComboBox.addItem(TOTAL_POWER);
+
         Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         ArrayList<String> powerLogDeviceIds = theHistorian.getPowerLogDeviceIds();
-        
+
         Collections.sort(powerLogDeviceIds);
-        
-        for(String s: powerLogDeviceIds) {
+
+        for (String s : powerLogDeviceIds) {
             deviceComboBox.addItem(s);
         }
-        
+
         deviceComboBox.setSelectedIndex(0);
+        deviceComboBox.setEnabled(true);
+    }
+
+    public String getSelectedDevice() {
+        return (String) deviceComboBox.getSelectedItem();
+
     }
 
     /**
@@ -62,8 +91,28 @@ public class PowerPanel extends javax.swing.JPanel {
 
         deviceComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        chartPanel = new ChartPanel(myChart);
+
+        deviceComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deviceComboBoxActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Device ID:");
+
+        chartPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout chartPanelLayout = new javax.swing.GroupLayout(chartPanel);
+        chartPanel.setLayout(chartPanelLayout);
+        chartPanelLayout.setHorizontalGroup(
+            chartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        chartPanelLayout.setVerticalGroup(
+            chartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 409, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -71,10 +120,14 @@ public class PowerPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(654, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 644, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -83,11 +136,58 @@ public class PowerPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addContainerGap(586, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(169, 169, 169))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void deviceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deviceComboBoxActionPerformed
+        JComboBox source = (JComboBox) evt.getSource();
+        String chartFocus = (String) source.getSelectedItem();
+        LOGGER.log(Level.INFO, "Changing Chart Focus To: {0}", chartFocus);
+        updateChart(chartFocus);
+    }//GEN-LAST:event_deviceComboBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel chartPanel;
     private javax.swing.JComboBox deviceComboBox;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
+
+    public void handleNewPowerLog(Powerlog newLog) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void updateChart(String focus) {
+        Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+        ArrayList<Powerlog> powerlogs;
+
+        Calendar theCalendar = Calendar.getInstance();
+
+        Date currentDate = theCalendar.getTime();
+        theCalendar.add(Calendar.DATE, -1);
+        Date yesterday = theCalendar.getTime();
+
+        powerSeries = new XYSeries("First");
+        dataset = new XYSeriesCollection(powerSeries);
+
+
+        LOGGER.log(Level.INFO, "Obtaining all power logs for {0}", focus);
+        powerlogs = theHistorian.getPowerlogs(focus, yesterday, currentDate);
+        
+        
+        if(powerlogs == null) {
+            return;
+        }
+        LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
+        for (Powerlog p : powerlogs) {
+            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
+        }
+        
+        LOGGER.info("Added " + powerSeries.getItemCount() + " Data Items");
+
+        myChart = ChartFactory.createXYLineChart("Power Usage", "Date", "Power", dataset, PlotOrientation.VERTICAL, true, true, true);
+        
+        ((ChartPanel)chartPanel).setChart(myChart);
+    }
 }

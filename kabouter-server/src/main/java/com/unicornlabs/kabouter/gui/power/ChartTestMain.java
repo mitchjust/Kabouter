@@ -37,13 +37,13 @@ public class ChartTestMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Historian theHistorian = new Historian();
 
         Calendar theCalendar = Calendar.getInstance();
 
         Date currentDate = theCalendar.getTime();
-        theCalendar.add(Calendar.DATE, -1);
+        theCalendar.add(Calendar.MINUTE, -20);
         Date yesterday = theCalendar.getTime();
 
         ArrayList<Powerlog> logs = theHistorian.getPowerlogs("PDEV_001", yesterday, currentDate);
@@ -63,6 +63,16 @@ public class ChartTestMain {
         ChartFrame frame = new ChartFrame("Power",chart);
         frame.pack();
         frame.setVisible(true);
+        
+        while(true) {
+            Thread.sleep(100);
+            
+            double newX = series.getMaxX() + 1000;
+            double newY = 5000;
+            System.out.println("Trying To add " + newX + " " + newY);
+            series.add(newX, newY);
+            series.remove(0);
+        }
         
         
     }
