@@ -7,11 +7,9 @@
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/kabouter</property>
         <property name="hibernate.connection.username">kabouter</property>
         <property name="hibernate.connection.password">kabouter</property>
-        <property name="hibernate.max_fetch_depth">2</property>
-        <property name="hibernate.default_batch_fetch_size">8</property>
-        <property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Device.hbm.xml"/>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Powerlog.hbm.xml"/>
+        
     </session-factory>
 </hibernate-configuration>
