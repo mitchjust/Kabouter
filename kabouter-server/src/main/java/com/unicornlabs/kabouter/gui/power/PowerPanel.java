@@ -143,6 +143,8 @@ public class PowerPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deviceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deviceComboBoxActionPerformed
+        //TODO maybe change this to only occur where a apply button is pressed, lengthy operations.
+        
         JComboBox source = (JComboBox) evt.getSource();
         String chartFocus = (String) source.getSelectedItem();
         LOGGER.log(Level.INFO, "Changing Chart Focus To: {0}", chartFocus);
@@ -187,7 +189,7 @@ public class PowerPanel extends javax.swing.JPanel {
 
         LOGGER.log(Level.INFO, "Added {0} Data Items", powerSeries.getItemCount());
 
-        myChart = ChartFactory.createXYLineChart("Power Usage", "Date", "Power", dataset, PlotOrientation.VERTICAL, true, true, true);
+        myChart = ChartFactory.createXYLineChart("Power Usage For " + focus, "Date", "Power", dataset, PlotOrientation.VERTICAL, true, true, true);
 
         ((ChartPanel) chartPanel).setChart(myChart);
     }
