@@ -20,17 +20,13 @@ package com.unicornlabs.kabouter;
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.devices.DeviceManager;
-import com.unicornlabs.kabouter.gui.debug.DialogErrorHandler;
 import com.unicornlabs.kabouter.gui.GuiManager;
 import com.unicornlabs.kabouter.gui.SplashScreen;
+import com.unicornlabs.kabouter.gui.debug.DialogErrorHandler;
 import com.unicornlabs.kabouter.historian.Historian;
-import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -61,7 +57,7 @@ public class KabouterServerMain {
         //Put it in the middle of the screen and make it visible
         mySplashScreen.setLocationRelativeTo(null);
         mySplashScreen.setVisible(true);
-        mySplashScreen.addText("Starting Kabouter Server...");
+        mySplashScreen.addText("Starting Kabouter Server...\n");
 
         try {
 
@@ -87,8 +83,6 @@ public class KabouterServerMain {
             //Start the GUI Manager in the Swing Initializer Thread
             mySplashScreen.addText("Starting GUI Manager...");
 
-            //Finished loading all components
-            mySplashScreen.dispose();
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -98,6 +92,10 @@ public class KabouterServerMain {
                     theGuiManager.initalize();
                 }
             });
+            mySplashScreen.addText("Done!\n");
+            
+            //Finished loading all components
+            mySplashScreen.dispose();
 
         } catch (IOException ex) {
             mySplashScreen.addText("Exception In Startup: " + ex);
