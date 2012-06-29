@@ -57,8 +57,9 @@ public class KabouterClientPipelineFactory implements
         ChannelPipeline myPipeline = Channels.pipeline();
         
         //Attach frame delimiter and string en/decoders
-        myPipeline.addLast("framer", new DelimiterBasedFrameDecoder(
+        myPipeline.addLast("framedelimiter", new DelimiterBasedFrameDecoder(
                   8192, Delimiters.lineDelimiter()));
+        
         myPipeline.addLast("stringdecoder", new StringDecoder());
         myPipeline.addLast("stringencoder", new StringEncoder());
         
