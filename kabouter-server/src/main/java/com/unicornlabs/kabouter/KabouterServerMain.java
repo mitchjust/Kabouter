@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter;
 
+import com.unicornlabs.kabouter.clients.ClientManager;
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.devices.DeviceManager;
@@ -79,6 +80,12 @@ public class KabouterServerMain {
             DeviceManager theDeviceManager = new DeviceManager();
             BusinessObjectManager.registerBusinessObject(DeviceManager.class.getName(), theDeviceManager);
             mySplashScreen.addText("Done!\n");
+            
+            mySplashScreen.addText("Starting Client Manager Service...");
+            ClientManager theClientManager = new ClientManager(4646);
+            theClientManager.startServer();
+            BusinessObjectManager.registerBusinessObject(ClientManager.class.getName(), theClientManager);
+            mySplashScreen.addText("Done!\n");
 
             //Start the GUI Manager in the Swing Initializer Thread
             mySplashScreen.addText("Starting GUI Manager...");
@@ -97,8 +104,8 @@ public class KabouterServerMain {
             //Finished loading all components
             mySplashScreen.dispose();
 
-        } catch (IOException ex) {
-            mySplashScreen.addText("Exception In Startup: " + ex);
+        } catch (Exception ex) {
+            mySplashScreen.addText("\n\nException In Startup: \n" + ex);
             LOGGER.log(Level.SEVERE, null, ex);
         }
     }
