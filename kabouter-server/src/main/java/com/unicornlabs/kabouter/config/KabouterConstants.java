@@ -54,6 +54,7 @@ public class KabouterConstants {
             File.separatorChar;
     public static String MODULE_MANAGER_SAVE_FILE = "modules.dat";
     
-    
+    public static int BOOLEAN_TRUE = -1;
+    public static int BOOLEAN_FALSE = 0;
 
 }

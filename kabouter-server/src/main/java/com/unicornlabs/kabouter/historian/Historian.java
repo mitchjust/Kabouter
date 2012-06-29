@@ -68,7 +68,7 @@ public class Historian {
     /**
      * Create a session factory if necessary
      */
-    public Historian() {
+    public Historian(){
         if(SESSIONFACTORY == null) {
             synchronized(HISTORIANLOCK) {
                 SESSIONFACTORY = HibernateUtil.getSessionFactory();

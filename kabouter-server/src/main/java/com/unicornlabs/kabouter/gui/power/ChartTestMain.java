@@ -17,7 +17,6 @@ package com.unicornlabs.kabouter.gui.power;
 
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;

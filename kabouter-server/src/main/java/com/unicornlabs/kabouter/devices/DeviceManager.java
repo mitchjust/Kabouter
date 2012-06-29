@@ -23,6 +23,9 @@ import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +46,7 @@ public class DeviceManager {
     }
     
     private Historian theHistorian;
-    private ArrayList<DeviceInfo> myDeviceInfos;
+    private HashMap<String,DeviceInfo> myDeviceInfos;
     private ArrayList<DeviceEventListener> myDeviceEventListeners;
     
     /**
@@ -51,7 +54,7 @@ public class DeviceManager {
      */
     public DeviceManager() {
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
-        myDeviceInfos = new ArrayList<DeviceInfo>();
+        myDeviceInfos = new HashMap<String, DeviceInfo>();
         myDeviceEventListeners = new ArrayList<DeviceEventListener>();
         generateDeviceInfos();
     }
@@ -64,21 +67,38 @@ public class DeviceManager {
         
         for(Device d : devices) {
             LOGGER.log(Level.INFO, "Loading Config For Device: {0}", d.getId());
-            DeviceInfo di = new DeviceInfo();
-            di.theDevice = d;
-            di.isConnected = false;
-            myDeviceInfos.add(di);
+            DeviceInfo di = new DeviceInfo(d);
+            myDeviceInfos.put(d.getId(),di);
         }
     }
     
     /**
-     * Performs an Update on all Devices in the device manager
+     * Gets a reference to the main list of Device Infos
+     * @return the list
      */
-    private void updateAllDeviceEntries() {
-        for(DeviceInfo di : myDeviceInfos) {
-            Device d = di.theDevice;
-            theHistorian.updateDevice(d);
+    public DeviceInfo[] getDeviceInfos() {
+        Set<String> keySet = myDeviceInfos.keySet();
+        DeviceInfo[] deviceInfoList = new DeviceInfo[keySet.size()];
+        
+        Iterator<String> iterator = keySet.iterator();
+        int i = 0;
+        
+        while(iterator.hasNext()) {
+            String key = iterator.next();
+            deviceInfoList[i++] = myDeviceInfos.get(key);
         }
+        
+        return deviceInfoList;
+    }
+    
+    /**
+     * Gets the device info for a device id
+     * @param deviceId the device id
+     * @return the device info
+     */
+    public DeviceInfo getDeviceInfo(String deviceId) {
+        DeviceInfo get = myDeviceInfos.get(deviceId);
+        return get;
     }
 
     /**
@@ -88,7 +108,5 @@ public class DeviceManager {
     public void addDeviceEventListener(DeviceEventListener newListener) {
         myDeviceEventListeners.add(newListener);
     }
-    
-    
 
 }
