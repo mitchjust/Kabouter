@@ -69,10 +69,21 @@ public class TestClient {
             }
         }
         
-        else if(command.equals("connect")) {
+        else if(command.startsWith("connect")) {
             try {
-                mySocket = new Socket(InetAddress.getLocalHost(), 4646);
+                
+                String[] split = command.split(" ");
+                
+                if(split.length == 3) {
+                
+                mySocket = new Socket(InetAddress.getByName(split[1]), Integer.parseInt(split[2]));
+                }
+                else {
+                    mySocket = new Socket(InetAddress.getLocalHost(), 4646);
+                }
+                
                 System.out.println("Connection Established");
+                
                 
                 socketin = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
                 socketout = new PrintWriter(new OutputStreamWriter(mySocket.getOutputStream()));

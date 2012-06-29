@@ -18,10 +18,8 @@
 package com.unicornlabs.kabouter.automation;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
-import com.unicornlabs.kabouter.clients.ClientManager;
-import com.unicornlabs.kabouter.config.ConfigManager;
+import com.unicornlabs.kabouter.devices.DeviceInfo;
 import com.unicornlabs.kabouter.devices.DeviceManager;
-import com.unicornlabs.kabouter.gui.GuiManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description: TODO Add Class Description
+ * Description: Controls the automation features
  */
 public class AutomationManager {
 
@@ -39,6 +37,27 @@ public class AutomationManager {
 
     static {
         LOGGER.setLevel(Level.ALL);
+    }
+    
+    private DeviceManager theDeviceManager;
+    private Historian theHistorian;
+    
+    public AutomationManager() {
+        theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+    }
+    
+    public void forceIOState(String deviceId, int ioNum, int value) {
+        DeviceInfo di = theDeviceManager.getDeviceInfo(deviceId);
+        
+        if(di == null) {
+            LOGGER.log(Level.SEVERE, "Invalid Device ID specified in IO Override: {0}", deviceId);
+            return;
+        }
+        
+        di.ioStates[ioNum] = value;
+        
+        theDeviceManager.updateDevice(di);
     }
     
 }

@@ -18,9 +18,11 @@
 package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import com.unicornlabs.kabouter.net.TCPChannelServer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +48,8 @@ public class DeviceManager {
      * Reference to the historian
      */
     private Historian theHistorian;
+    
+    private ConfigManager theConfigManager;
     /**
      * Map of devices to device ids
      */
@@ -55,14 +59,28 @@ public class DeviceManager {
      */
     private ArrayList<DeviceEventListener> myDeviceEventListeners;
 
+    private TCPChannelServer myTCPChannelServer;
+    
+    private int myPort;
+    
     /**
      * Obtains Historian reference and generates DeviceInfo objects
      */
     public DeviceManager() {
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+        theConfigManager = (ConfigManager) BusinessObjectManager.getBusinessObject(ConfigManager.class.getName());
+        this.myPort = Integer.parseInt(theConfigManager.getProperty(DeviceManager.class.getName(), "TCP_LISTENING_PORT"));
         myDeviceInfos = new HashMap<String, DeviceInfo>();
         myDeviceEventListeners = new ArrayList<DeviceEventListener>();
         generateDeviceInfos();
+    }
+    
+    /**
+     * Starts the TCP Listening server
+     */
+    public void startServer() {
+        myTCPChannelServer = new TCPChannelServer(myPort, new KabouterDevicePipelineFactory());
+        myTCPChannelServer.run();
     }
 
     /**
@@ -116,6 +134,14 @@ public class DeviceManager {
      */
     public void addDeviceEventListener(DeviceEventListener newListener) {
         myDeviceEventListeners.add(newListener);
+    }
+
+    /**
+     * Updates IO States on remote device
+     * @param di 
+     */
+    public void updateDevice(DeviceInfo di) {
+        
     }
 
 }

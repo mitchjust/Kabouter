@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 // </editor-fold>
-package com.unicornlabs.kabouter.clients;
 
+package com.unicornlabs.kabouter.devices;
+
+import com.unicornlabs.kabouter.clients.ClientServerMessage;
 import com.unicornlabs.kabouter.net.JSONDecoder;
 import com.unicornlabs.kabouter.net.JSONEncoder;
 import java.util.logging.Level;
@@ -30,23 +32,23 @@ import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 
 /**
- * KabouterClientPipelineFactory.java
- *
+ * KabouterDevicePipelineFactory.java
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description: Pipeline Factory to handle requests from Kabouter Clients
+ * Description:
+ * Pipeline factory for kabouter-enabled end devices
  */
-public class KabouterClientPipelineFactory implements
-        ChannelPipelineFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(KabouterClientPipelineFactory.class.getName());
+public class KabouterDevicePipelineFactory implements ChannelPipelineFactory{
 
-    static {
+    private static final Logger LOGGER = Logger.getLogger(KabouterDevicePipelineFactory.class.getName());
+    
+    static{
         LOGGER.setLevel(Level.ALL);
     }
-
-    /**
-     * Constructs the pipeline for handling client messaging
+    
+        /**
+     * Constructs the pipeline for handling device messaging
      *
      * @return the pipeline
      * @throws Exception
@@ -67,8 +69,9 @@ public class KabouterClientPipelineFactory implements
         myPipeline.addLast("jsonencoder", new JSONEncoder());
 
         //Attach a Kabouter Client Handler at the end of the stream
-        myPipeline.addLast("handler", new KabouterClientHandler());
+        myPipeline.addLast("handler", new KabouterDeviceHandler());
 
         return myPipeline;
     }
+
 }

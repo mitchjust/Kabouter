@@ -53,8 +53,7 @@ public class ClientManager {
      */
     public ClientManager() {
         theConfigManager = (ConfigManager) BusinessObjectManager.getBusinessObject(ConfigManager.class.getName());
-        int port = Integer.parseInt(theConfigManager.getProperty(ClientManager.class.getName(), "TCP_LISTENING_PORT"));
-        this.myPort = port;
+        this.myPort = Integer.parseInt(theConfigManager.getProperty(ClientManager.class.getName(), "TCP_LISTENING_PORT"));
     }
 
     /**

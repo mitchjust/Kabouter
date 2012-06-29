@@ -84,6 +84,7 @@ public class KabouterServerMain {
             //Setup the Device Manager
             mySplashScreen.addText("Starting Device Manager Service...");
             DeviceManager theDeviceManager = new DeviceManager();
+            theDeviceManager.startServer();
             BusinessObjectManager.registerBusinessObject(DeviceManager.class.getName(), theDeviceManager);
             mySplashScreen.addText("Done!\n");
 
