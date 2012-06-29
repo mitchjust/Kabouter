@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * KabouterServerMain.java
@@ -73,6 +72,7 @@ public class KabouterServerMain {
                     KabouterConstants.CONFIG_PATH
                     + KabouterConstants.KABOUTER_SERVER_PROPERTIES);
             ConfigManager theConfigManager = new ConfigManager(myPropertiesStream);
+            BusinessObjectManager.registerBusinessObject(ConfigManager.class.getName(), theConfigManager);
             mySplashScreen.addText("Done!\n");
 
             //Setup the Historian
@@ -89,7 +89,7 @@ public class KabouterServerMain {
 
             //Setup the Client Manager
             mySplashScreen.addText("Starting Client Manager Service...");
-            ClientManager theClientManager = new ClientManager(4646);
+            ClientManager theClientManager = new ClientManager();
             theClientManager.startServer();
             BusinessObjectManager.registerBusinessObject(ClientManager.class.getName(), theClientManager);
             mySplashScreen.addText("Done!\n");
@@ -144,14 +144,8 @@ public class KabouterServerMain {
                 try {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(KabouterServerMain.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(KabouterServerMain.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(KabouterServerMain.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(KabouterServerMain.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
                 }
             }
         }
