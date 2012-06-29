@@ -45,7 +45,8 @@ public class DialogErrorHandler extends Handler {
 
     /**
      * Displays severs log items
-     * @param record 
+     *
+     * @param record
      */
     @Override
     public void publish(LogRecord record) {

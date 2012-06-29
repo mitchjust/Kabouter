@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.net;
 
 import java.net.InetSocketAddress;
@@ -28,30 +27,26 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
  * TCPChannelServer.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Generic Netty TCP Channel nio server
+ * Description: Generic Netty TCP Channel nio server
  */
-
 public class TCPChannelServer {
 
     private static final Logger LOGGER = Logger.getLogger(TCPChannelServer.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     /**
      * the port to listen on
      */
     private int port;
-    
     /**
      * the server bootstrap
      */
     private ServerBootstrap myBootstrap;
-    
     /**
      * the pipeline factory
      */
@@ -59,6 +54,7 @@ public class TCPChannelServer {
 
     /**
      * Set the initial parameters
+     *
      * @param port the port to listen on
      * @param myFactory the factory to use to create pipelines
      */
@@ -66,7 +62,7 @@ public class TCPChannelServer {
         this.port = port;
         this.myFactory = myFactory;
     }
-    
+
     /**
      * Start the server
      */
@@ -74,12 +70,11 @@ public class TCPChannelServer {
         //Create bootstrap with cached executors
         myBootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
-                Executors.newCachedThreadPool(), 
+                Executors.newCachedThreadPool(),
                 Executors.newCachedThreadPool()));
-        
+
         myBootstrap.setPipelineFactory(myFactory);
-        
+
         myBootstrap.bind(new InetSocketAddress(port));
     }
-    
 }

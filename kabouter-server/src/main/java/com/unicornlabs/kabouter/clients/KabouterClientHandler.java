@@ -28,7 +28,7 @@ import org.jboss.netty.channel.*;
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description: TODO Add Class Description
+ * Description: Handles Client communications
  */
 public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
 
@@ -37,6 +37,10 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
     static {
         LOGGER.setLevel(Level.ALL);
     }
+    
+    /**
+     * The device manager reference
+     */
     private DeviceManager theDeviceManager;
 
     /**
@@ -85,7 +89,7 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
         if (message.messageType.contentEquals(ClientServerMessage.DEVICE_INFO_REQUEST)) {
             ctx.getChannel().write(theDeviceManager.getDeviceInfo(message.deviceId));
         } else if (message.messageType.contentEquals(ClientServerMessage.DEVICE_CONTROL_REQUEST)) {
-            
+            //TODO Handle io change
         } else {
             LOGGER.log(Level.SEVERE, "Unknown Message Type: \n{0}", e.getMessage());
         }

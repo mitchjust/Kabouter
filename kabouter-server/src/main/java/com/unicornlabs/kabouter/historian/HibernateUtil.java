@@ -25,14 +25,14 @@ import org.hibernate.cfg.AnnotationConfiguration;
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description: Hibernate Utility class with a convenient method to get Session Factory
- * object.
+ * Description: Hibernate Utility class with a convenient method to get Session
+ * Factory object.
  */
 public class HibernateUtil {
 
     //The static session factory
     private static final SessionFactory sessionFactory;
-    
+
     /*
      * On first instantiation, create factory
      */
@@ -47,7 +47,7 @@ public class HibernateUtil {
             throw new ExceptionInInitializerError(ex);
         }
     }
-    
+
     /*
      * return the static factory
      */

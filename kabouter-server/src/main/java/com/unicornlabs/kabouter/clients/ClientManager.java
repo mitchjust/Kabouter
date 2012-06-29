@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.clients;
 
 import com.unicornlabs.kabouter.net.TCPChannelServer;
@@ -24,30 +23,42 @@ import java.util.logging.Logger;
 
 /**
  * ClientManager.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Handles information requests from clients
+ * Description: Handles information requests from clients
  */
-
 public class ClientManager {
 
     private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
     
+    /**
+     * The TCP Server
+     */
     private TCPChannelServer myTCPChannelServer;
+    
+    /**
+     * The port to listen on
+     */
     private int myPort;
 
+    /**
+     * Set the port
+     * @param myPort the port
+     */
     public ClientManager(int myPort) {
         this.myPort = myPort;
     }
-    
+
+    /**
+     * Starts the TCP Listening server
+     */
     public void startServer() {
         myTCPChannelServer = new TCPChannelServer(myPort, new KabouterClientPipelineFactory());
         myTCPChannelServer.run();
     }
-
 }

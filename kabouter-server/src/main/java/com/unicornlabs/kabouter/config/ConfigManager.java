@@ -25,39 +25,38 @@ import java.util.logging.Logger;
 
 /**
  * ConfigManager.java
+ *
  * @author Mitch
  *
- * Description:
- * Holds the main properties for the application
+ * Description: Holds the main properties for the application
  */
-
 public class ConfigManager {
 
     private static final Logger LOGGER = Logger.getLogger(ConfigManager.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     private Properties myProperties;
-    
+
     /**
      * Load the properties file
+     *
      * @param properties the stream to the properties file
-     * @throws IOException 
+     * @throws IOException
      */
     public ConfigManager(InputStream properties) throws IOException {
         myProperties = new Properties();
         myProperties.load(properties);
     }
-    
+
     /**
      * Get a value from the properties file
+     *
      * @param key the corresponding key
      * @return the value
      */
     public String getProperty(String key) {
         return myProperties.getProperty(key);
     }
-
 }

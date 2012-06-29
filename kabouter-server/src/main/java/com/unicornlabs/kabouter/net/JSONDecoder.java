@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.net;
 
 import com.unicornlabs.kabouter.util.JSONUtils;
@@ -27,20 +26,18 @@ import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 
 /**
  * JSONDecoder.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Upstream JSON Decoder for specified message class
+ * Description: Upstream JSON Decoder for specified message class
  */
-
 public class JSONDecoder<T> extends OneToOneDecoder {
 
     private static final Logger LOGGER = Logger.getLogger(JSONDecoder.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     /**
      * The decoded message class
      */
@@ -48,6 +45,7 @@ public class JSONDecoder<T> extends OneToOneDecoder {
 
     /**
      * Sets the message class
+     *
      * @param messageClass the message class
      */
     public JSONDecoder(Class<T> messageClass) {
@@ -56,22 +54,22 @@ public class JSONDecoder<T> extends OneToOneDecoder {
 
     /**
      * Decodes from a JSON String to a message object
+     *
      * @param chc the ChannelHandlerContext
      * @param chnl the Channel
      * @param o the JSON String
      * @return the decoded message object
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     protected Object decode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
-        if(!(o instanceof String)) {
+        if (!(o instanceof String)) {
             //Ignore it if we can't decode it
             return o;
         }
-        
+
         String jsonString = (String) o;
-        
+
         return JSONUtils.FromJSON(jsonString, messageClass);
     }
-
 }

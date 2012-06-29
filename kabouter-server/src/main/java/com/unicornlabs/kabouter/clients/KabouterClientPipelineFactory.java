@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.clients;
 
 import com.unicornlabs.kabouter.net.JSONDecoder;
@@ -32,45 +31,44 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 
 /**
  * KabouterClientPipelineFactory.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Pipeline Factory to handle requests from Kabouter Clients
+ * Description: Pipeline Factory to handle requests from Kabouter Clients
  */
-
-public class KabouterClientPipelineFactory implements 
-        ChannelPipelineFactory{
+public class KabouterClientPipelineFactory implements
+        ChannelPipelineFactory {
 
     private static final Logger LOGGER = Logger.getLogger(KabouterClientPipelineFactory.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
 
     /**
      * Constructs the pipeline for handling client messaging
+     *
      * @return the pipeline
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline myPipeline = Channels.pipeline();
-        
+
         //Attach frame delimiter and string en/decoders
         myPipeline.addLast("framedelimiter", new DelimiterBasedFrameDecoder(
-                  8192, Delimiters.lineDelimiter()));
-        
+                8192, Delimiters.lineDelimiter()));
+
         myPipeline.addLast("stringdecoder", new StringDecoder());
         myPipeline.addLast("stringencoder", new StringEncoder());
-        
+
         //Attach JSON en/decoders
         myPipeline.addLast("jsondecoder", new JSONDecoder<ClientServerMessage>(ClientServerMessage.class));
         myPipeline.addLast("jsonencoder", new JSONEncoder());
-        
+
         //Attach a Kabouter Client Handler at the end of the stream
         myPipeline.addLast("handler", new KabouterClientHandler());
-        
+
         return myPipeline;
     }
-
 }

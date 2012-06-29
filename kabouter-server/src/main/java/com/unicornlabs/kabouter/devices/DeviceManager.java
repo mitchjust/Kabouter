@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
@@ -31,24 +30,31 @@ import java.util.logging.Logger;
 
 /**
  * DeviceManager.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Manages Devices connected to the system
+ * Description: Manages Devices connected to the system
  */
-
 public class DeviceManager {
 
     private static final Logger LOGGER = Logger.getLogger(DeviceManager.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
+    /**
+     * Reference to the historian
+     */
     private Historian theHistorian;
-    private HashMap<String,DeviceInfo> myDeviceInfos;
+    /**
+     * Map of devices to device ids
+     */
+    private HashMap<String, DeviceInfo> myDeviceInfos;
+    /**
+     * List of event listeners
+     */
     private ArrayList<DeviceEventListener> myDeviceEventListeners;
-    
+
     /**
      * Obtains Historian reference and generates DeviceInfo objects
      */
@@ -58,41 +64,43 @@ public class DeviceManager {
         myDeviceEventListeners = new ArrayList<DeviceEventListener>();
         generateDeviceInfos();
     }
-    
+
     /**
      * Get the saved devices from the historian and generate DeviceInfo objects
      */
     private void generateDeviceInfos() {
         ArrayList<Device> devices = theHistorian.getDevices();
-        
-        for(Device d : devices) {
+
+        for (Device d : devices) {
             LOGGER.log(Level.INFO, "Loading Config For Device: {0}", d.getId());
             DeviceInfo di = new DeviceInfo(d);
-            myDeviceInfos.put(d.getId(),di);
+            myDeviceInfos.put(d.getId(), di);
         }
     }
-    
+
     /**
      * Gets a reference to the main list of Device Infos
+     *
      * @return the list
      */
     public DeviceInfo[] getDeviceInfos() {
         Set<String> keySet = myDeviceInfos.keySet();
         DeviceInfo[] deviceInfoList = new DeviceInfo[keySet.size()];
-        
+
         Iterator<String> iterator = keySet.iterator();
         int i = 0;
-        
-        while(iterator.hasNext()) {
+
+        while (iterator.hasNext()) {
             String key = iterator.next();
             deviceInfoList[i++] = myDeviceInfos.get(key);
         }
-        
+
         return deviceInfoList;
     }
-    
+
     /**
      * Gets the device info for a device id
+     *
      * @param deviceId the device id
      * @return the device info
      */
@@ -103,10 +111,10 @@ public class DeviceManager {
 
     /**
      * Attaches a new DeviceEventListener
+     *
      * @param newListener the new listener
      */
     public void addDeviceEventListener(DeviceEventListener newListener) {
         myDeviceEventListeners.add(newListener);
     }
-
 }

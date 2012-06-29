@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.config.KabouterConstants;
@@ -26,42 +25,55 @@ import java.util.logging.Logger;
 
 /**
  * DeviceInfo.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Device Manager representation of Device Objects
+ * Description: Device Manager representation of Device Objects
  */
-
-public class DeviceInfo implements Serializable{
+public class DeviceInfo implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(DeviceInfo.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
+
     /**
      * Construct a DeviceInfo object
-     * @param theDevice 
+     *
+     * @param theDevice
      */
     public DeviceInfo(Device theDevice) {
         //Create array
         ioStates = new Integer[theDevice.getNumio()];
         //Set connected state to false initially
         isConnected = false;
-        
+
         this.theDevice = theDevice;
-        
+
         //Set inital io states to false
-        for(int i=0;i<theDevice.getNumio();i++) {
+        for (int i = 0; i < theDevice.getNumio(); i++) {
             ioStates[i] = KabouterConstants.BOOLEAN_FALSE;
         }
     }
-    
+    /**
+     * The associated Device
+     */
     public Device theDevice;
+    /**
+     * The connection status
+     */
     public boolean isConnected;
+    /**
+     * The status of the io
+     */
     public Integer[] ioStates;
-    
+
+    /**
+     * Debugging String output
+     *
+     * @return
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("----Device Info----").append("\n");
@@ -71,15 +83,13 @@ public class DeviceInfo implements Serializable{
         sb.append(theDevice.getType()).append("\n");
         sb.append("Connected: ").append(isConnected).append("\n");
         sb.append("Power Logging: ").append(theDevice.getHaspowerlogging()).append("\n");
-        
-        for(int i=0;i<theDevice.getNumio();i++) {
-            sb.append("IO#").append(i).append(" {").append(theDevice.getIonames()
-                    .get(i)).append("}: ").append(ioStates[i]).append("\n");
+
+        for (int i = 0; i < theDevice.getNumio(); i++) {
+            sb.append("IO#").append(i).append(" {").append(theDevice.getIonames().get(i)).append("}: ").append(ioStates[i]).append("\n");
         }
-        
+
         sb.append("-------------------").append("\n");
-        
+
         return sb.toString();
     }
-
 }

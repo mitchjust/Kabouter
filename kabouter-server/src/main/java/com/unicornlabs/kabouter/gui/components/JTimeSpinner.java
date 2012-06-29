@@ -28,7 +28,7 @@ import javax.swing.SpinnerDateModel;
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description: TODO Add Class Description
+ * Description: JSpinner for entering times
  */
 public class JTimeSpinner extends JSpinner {
 
@@ -38,10 +38,17 @@ public class JTimeSpinner extends JSpinner {
         LOGGER.setLevel(Level.ALL);
     }
 
+    /**
+     * Create JTimeSpinner with current date
+     */
     public JTimeSpinner() {
         this(new Date());
     }
-    
+
+    /**
+     * Create JTimeSpinner with an initial value
+     * @param initalValue 
+     */
     public JTimeSpinner(Date initalValue) {
         super(new SpinnerDateModel());
         JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(this, "HH:mm:ss");

@@ -49,6 +49,10 @@ public class KabouterServerMain {
         LOGGER.setLevel(Level.ALL);
     }
 
+    /**
+     * Main method for Server
+     * @param args input arguments
+     */
     public static void main(String[] args) {
 
         //Display the splash screen
@@ -71,16 +75,19 @@ public class KabouterServerMain {
             ConfigManager theConfigManager = new ConfigManager(myPropertiesStream);
             mySplashScreen.addText("Done!\n");
 
+            //Setup the Historian
             mySplashScreen.addText("Starting Historian Service...");
             Historian theHistorian = new Historian();
             BusinessObjectManager.registerBusinessObject(Historian.class.getName(), theHistorian);
             mySplashScreen.addText("Done!\n");
 
+            //Setup the Device Manager
             mySplashScreen.addText("Starting Device Manager Service...");
             DeviceManager theDeviceManager = new DeviceManager();
             BusinessObjectManager.registerBusinessObject(DeviceManager.class.getName(), theDeviceManager);
             mySplashScreen.addText("Done!\n");
-            
+
+            //Setup the Client Manager
             mySplashScreen.addText("Starting Client Manager Service...");
             ClientManager theClientManager = new ClientManager(4646);
             theClientManager.startServer();
@@ -100,7 +107,7 @@ public class KabouterServerMain {
                 }
             });
             mySplashScreen.addText("Done!\n");
-            
+
             //Finished loading all components
             mySplashScreen.dispose();
 

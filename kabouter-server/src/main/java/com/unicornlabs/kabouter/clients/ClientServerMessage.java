@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.clients;
 
 import java.io.Serializable;
@@ -24,26 +23,22 @@ import java.util.logging.Logger;
 
 /**
  * ClientServerMessage.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * TODO Add Class Description
+ * Description: Basic Message object from clients
  */
-
-public class ClientServerMessage implements Serializable{
+public class ClientServerMessage implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(ClientServerMessage.class.getName());
-    
     public static final String DEVICE_INFO_REQUEST = "DEVICE_INFO_REQUEST";
     public static final String DEVICE_CONTROL_REQUEST = "DEVICE_CONTROL_REQUEST";
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     public String messageType;
     public String deviceId;
     public int ioNum;
     public int ioState;
-
 }

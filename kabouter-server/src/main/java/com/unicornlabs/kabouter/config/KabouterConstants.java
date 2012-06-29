@@ -23,38 +23,33 @@ import java.util.logging.Logger;
 
 /**
  * KabouterConstants.java
+ *
  * @author Mitch
  *
- * Description:
- * Contains Constant variables
+ * Description: Contains Constant variables
  */
-
 public class KabouterConstants {
 
     private static final Logger LOGGER = Logger.getLogger(KabouterConstants.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     //App specific constants
     public static final String APP_NAME = "Kabouter Server";
     public static final String APP_VERSION = "V1.0 SNAPSHOT";
     public static final String FRAME_TITLE = APP_NAME + " " + APP_VERSION;
-    
     //Jar File constants
     public static final String CONFIG_PATH = "/com/unicornlabs/kabouter/config/";
     public static final String LOGGING_PROPERTIES = "logging.properties";
     public static final String KABOUTER_SERVER_PROPERTIES = "kabouterserver.properties";
-    
     //Local File constants
-    public static final String APP_DIRECTORY = System.getProperty("user.home") + 
-            File.separatorChar + 
-            ".KabouterServer" + 
-            File.separatorChar;
+    public static final String APP_DIRECTORY = System.getProperty("user.home")
+            + File.separatorChar
+            + ".KabouterServer"
+            + File.separatorChar;
     public static String MODULE_MANAGER_SAVE_FILE = "modules.dat";
-    
+    //Boolean constants
     public static int BOOLEAN_TRUE = -1;
     public static int BOOLEAN_FALSE = 0;
-
 }

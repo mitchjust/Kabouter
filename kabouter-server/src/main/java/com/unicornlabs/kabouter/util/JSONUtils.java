@@ -23,22 +23,22 @@ import java.util.logging.Logger;
 
 /**
  * GSONUtils.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Easily Convert between JSON and Objects
+ * Description: Easily Convert between JSON and Objects
  */
-
 public class JSONUtils {
 
     private static final Logger LOGGER = Logger.getLogger(JSONUtils.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
+
     /**
      * Returns the JSON string representing the object
+     *
      * @param theObject object to be converted
      * @return the JSON String
      */
@@ -47,9 +47,10 @@ public class JSONUtils {
         String jsonString = myGson.toJson(theObject);
         return jsonString;
     }
-    
+
     /**
      * Return the object parsed from the JSON String
+     *
      * @param <T> The Class to return as
      * @param jsonString The JSON String representing the object
      * @param classOfT The Class to return as
@@ -60,5 +61,4 @@ public class JSONUtils {
         T theObject = myGson.fromJson(jsonString, classOfT);
         return theObject;
     }
-
 }

@@ -43,34 +43,33 @@ public class Historian {
     static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     //static session factory
     private static SessionFactory SESSIONFACTORY;
-    
     //syncronization lock
     //TODO Probably not necessary, HibernateUtil is thread-safe
     private static final Object HISTORIANLOCK = new Object();
-    
+
     /**
      * Get the settings for the session factory
+     *
      * @return the settings
      */
     public static Settings GetSettings() {
-        if(SESSIONFACTORY == null) {
-            synchronized(HISTORIANLOCK) {
+        if (SESSIONFACTORY == null) {
+            synchronized (HISTORIANLOCK) {
                 SESSIONFACTORY = HibernateUtil.getSessionFactory();
             }
         }
-        
-        return ((SessionFactoryImpl)SESSIONFACTORY).getSettings();
+
+        return ((SessionFactoryImpl) SESSIONFACTORY).getSettings();
     }
-    
+
     /**
      * Create a session factory if necessary
      */
-    public Historian(){
-        if(SESSIONFACTORY == null) {
-            synchronized(HISTORIANLOCK) {
+    public Historian() {
+        if (SESSIONFACTORY == null) {
+            synchronized (HISTORIANLOCK) {
                 SESSIONFACTORY = HibernateUtil.getSessionFactory();
             }
         }
@@ -87,6 +86,7 @@ public class Historian {
 
     /**
      * Gets a device with the specified id
+     *
      * @param deviceId the device id
      * @return the device
      */
@@ -106,9 +106,10 @@ public class Historian {
 
         return (Device) result.get(0);
     }
-    
+
     /**
      * Get all devices
+     *
      * @return arraylist of all devices
      */
     public ArrayList<Device> getDevices() {
@@ -118,11 +119,12 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
 
-        return (ArrayList)result;
+        return (ArrayList) result;
     }
 
     /**
      * Save a new device
+     *
      * @param theDevice the device to be saved
      */
     public void saveDevice(Device theDevice) {
@@ -132,9 +134,10 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Updates a device
+     *
      * @param theDevice the device to be updated
      */
     public void updateDevice(Device theDevice) {
@@ -144,9 +147,10 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Deletes a device
+     *
      * @param theDevice the device to be deleted
      */
     public void deleteDevice(Device theDevice) {
@@ -156,24 +160,26 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Returns the power logs for a device id
+     *
      * @param deviceId the device id
      * @return ArrayList of logs
      */
     public ArrayList<Powerlog> getPowerlogs(String deviceId) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
-        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '"+deviceId+"'").list();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "'").list();
         session.getTransaction().commit();
         session.close();
 
-        return (ArrayList)result;
-    } 
-    
+        return (ArrayList) result;
+    }
+
     /**
      * Returns the power logs for a device id between two dates
+     *
      * @param deviceId the device id
      * @param from the first date
      * @param to the last date
@@ -182,16 +188,17 @@ public class Historian {
     public ArrayList<Powerlog> getPowerlogs(String deviceId, Date from, Date to) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
-        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "' " +
-                "and powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "' "
+                + "and powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
         session.getTransaction().commit();
         session.close();
 
-        return (ArrayList)result;
+        return (ArrayList) result;
     }
-    
+
     /**
      * Returns all power logs from all devices between a date range
+     *
      * @param from the start date
      * @param to the end date
      * @return the list of power logs
@@ -203,11 +210,12 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
 
-        return (ArrayList)result;
+        return (ArrayList) result;
     }
-    
+
     /**
      * Saves a new power log
+     *
      * @param thePowerlog the log to save
      */
     public void savePowerlog(Powerlog thePowerlog) {
@@ -217,23 +225,25 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Saves a list of power logs
+     *
      * @param thePowerlog the log to save
      */
     public void savePowerlogs(ArrayList<Powerlog> thePowerlogs) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
-        for(Powerlog log : thePowerlogs) {
+        for (Powerlog log : thePowerlogs) {
             session.save(log);
         }
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Updates a power log
+     *
      * @param thePowerlog the log to update
      */
     public void updatePowerlog(Powerlog thePowerlog) {
@@ -243,9 +253,10 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Deletes a specified power log
+     *
      * @param thePowerlog the power log to delete
      */
     public void deletePowerlog(Powerlog thePowerlog) {
@@ -255,9 +266,10 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Deletes all logs for a device id
+     *
      * @param deviceId the device id
      */
     public void deletePowerLogs(String deviceId) {
@@ -267,9 +279,10 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
     }
-    
+
     /**
      * Returns the unique device ids in the power logs table
+     *
      * @return the list of device ids
      */
     public ArrayList<String> getPowerLogDeviceIds() {
@@ -279,6 +292,6 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
 
-        return (ArrayList)result;
+        return (ArrayList) result;
     }
 }

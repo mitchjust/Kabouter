@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.devices.events;
 
 import java.util.EventObject;
@@ -24,40 +23,61 @@ import java.util.logging.Logger;
 
 /**
  * NewClass.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * TODO Add Class Description
+ * Description: Event from device
  */
-
-public class DeviceEvent extends EventObject{
+public class DeviceEvent extends EventObject {
 
     private static final Logger LOGGER = Logger.getLogger(DeviceEvent.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
+    //Event types
     public static final String NEW_DEVICE_EVENT = "NEW_DEVICE_EVENT";
     public static final String POWER_LOG_EVENT = "POWER_LOG_EVENT";
     
+    //Attached objects
     private Object attachment;
+    
+    //The event type
     private String eventType;
 
+    /**
+     * Constructor
+     * @param o source of event
+     * @param eventType type of event
+     * @param attachment attachment
+     */
     public DeviceEvent(Object o, String eventType, Object attachment) {
         super(o);
         this.eventType = eventType;
         this.attachment = attachment;
     }
-    
+
+    /**
+     * Constructor with null attachment
+     * @param o source of event
+     * @param eventType type of event
+     */
     public DeviceEvent(Object o, String eventType) {
-        this(o,eventType,null);
+        this(o, eventType, null);
     }
 
+    /**
+     * Get the attachment
+     * @return the attachment
+     */
     public Object getAttachment() {
         return attachment;
     }
 
+    /**
+     * Get the event type
+     * @return the event type
+     */
     public String getEventType() {
         return eventType;
     }

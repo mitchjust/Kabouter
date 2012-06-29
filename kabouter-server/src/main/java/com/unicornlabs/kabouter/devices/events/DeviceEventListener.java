@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.devices.events;
 
 /**
  * DeviceEventListener.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * TODO Add Class Description
+ * Description: Interface for device event listeners
  */
-
 public interface DeviceEventListener {
-    
-    public void handleDeviceEvent(DeviceEvent e);
 
+    /**
+     * Handle a device event
+     * @param e the device event
+     */
+    public void handleDeviceEvent(DeviceEvent e);
 }

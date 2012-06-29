@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.net;
 
 import com.unicornlabs.kabouter.util.JSONUtils;
@@ -27,35 +26,34 @@ import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
 /**
  * JSONEncoder.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Downstream JSON Encoder
+ * Description: Downstream JSON Encoder
  */
-
-public class JSONEncoder extends OneToOneEncoder{
+public class JSONEncoder extends OneToOneEncoder {
 
     private static final Logger LOGGER = Logger.getLogger(JSONEncoder.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
 
     /**
      * Encodes a message to a JSON String
+     *
      * @param chc the ChannelHandlerContext
      * @param chnl the Channel
      * @param o the message object
      * @return the JSON String
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
-    protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {    
+    protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
         String jsonString = JSONUtils.ToJSON(o);
-        
+
         LOGGER.log(Level.INFO, "Writing JSON String:\n{0}", jsonString);
-        
+
         return jsonString;
     }
-
 }

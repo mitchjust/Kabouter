@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.test;
 
 import java.util.logging.Level;
@@ -23,21 +22,17 @@ import java.util.logging.Logger;
 
 /**
  * DemoPowerModule.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * TODO Add Class Description
+ * Description: TODO Add Class Description
  */
-
-public class DemoPowerModule extends Thread{
+public class DemoPowerModule extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(DemoPowerModule.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     private String myDeviceId;
-    
-
 }
