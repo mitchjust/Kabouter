@@ -63,13 +63,13 @@ public class JSONDecoder<T> extends OneToOneDecoder {
      */
     @Override
     protected Object decode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
-        if (!(o instanceof String)) {
-            //Ignore it if we can't decode it
-            return o;
-        }
 
         String jsonString = (String) o;
 
-        return JSONUtils.FromJSON(jsonString, messageClass);
+        T message = JSONUtils.FromJSON(jsonString, messageClass);
+        
+        System.out.println("message = " + message);
+        
+        return message;
     }
 }

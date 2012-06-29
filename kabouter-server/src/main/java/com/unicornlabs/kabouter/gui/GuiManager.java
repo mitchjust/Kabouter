@@ -61,7 +61,7 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
 
         //Get device mangaer
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
-
+        
         //Setup main frame
         myMainFrame = new MainFrame();
         myMainFrame.setLocationRelativeTo(null);
@@ -141,4 +141,5 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
         });
 
     }
+    
 }

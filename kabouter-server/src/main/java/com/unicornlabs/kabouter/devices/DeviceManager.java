@@ -117,4 +117,5 @@ public class DeviceManager {
     public void addDeviceEventListener(DeviceEventListener newListener) {
         myDeviceEventListeners.add(newListener);
     }
+
 }

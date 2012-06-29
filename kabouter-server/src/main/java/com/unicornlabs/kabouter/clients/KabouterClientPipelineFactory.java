@@ -21,9 +21,7 @@ import com.unicornlabs.kabouter.net.JSONDecoder;
 import com.unicornlabs.kabouter.net.JSONEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.string.StringDecoder;
@@ -54,7 +52,7 @@ public class KabouterClientPipelineFactory implements
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline myPipeline = Channels.pipeline();
-
+        
         //Attach frame delimiter and string en/decoders
         myPipeline.addLast("framedelimiter", new DelimiterBasedFrameDecoder(
                 8192, Delimiters.lineDelimiter()));

@@ -35,12 +35,10 @@ public class ClientManager {
     static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     /**
      * The TCP Server
      */
     private TCPChannelServer myTCPChannelServer;
-    
     /**
      * The port to listen on
      */
@@ -48,6 +46,7 @@ public class ClientManager {
 
     /**
      * Set the port
+     *
      * @param myPort the port
      */
     public ClientManager(int myPort) {
@@ -61,4 +60,5 @@ public class ClientManager {
         myTCPChannelServer = new TCPChannelServer(myPort, new KabouterClientPipelineFactory());
         myTCPChannelServer.run();
     }
+    
 }

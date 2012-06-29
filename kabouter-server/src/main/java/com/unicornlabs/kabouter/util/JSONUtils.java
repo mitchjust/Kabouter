@@ -44,7 +44,7 @@ public class JSONUtils {
      */
     public static String ToJSON(Object theObject) {
         Gson myGson = new Gson();
-        String jsonString = myGson.toJson(theObject);
+        String jsonString = myGson.toJson(theObject) + "\n";
         return jsonString;
     }
 
