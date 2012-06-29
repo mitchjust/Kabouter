@@ -59,4 +59,14 @@ public class ConfigManager {
     public String getProperty(String key) {
         return myProperties.getProperty(key);
     }
+    
+    /**
+     * Gets a value in the form of package.class.property
+     * @param className the full package and class
+     * @param propertyName the property
+     * @return the value
+     */
+    public String getProperty(String className, String propertyName) {
+        return getProperty(className+"."+propertyName);
+    }
 }

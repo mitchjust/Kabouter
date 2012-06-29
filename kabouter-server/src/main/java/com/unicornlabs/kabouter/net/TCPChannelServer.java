@@ -67,6 +67,7 @@ public class TCPChannelServer {
      * Start the server
      */
     public void run() {
+        LOGGER.log(Level.INFO, "Starting TCP Channel Server on port {0}", port);
         //Create bootstrap with cached executors
         myBootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(

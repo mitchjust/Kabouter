@@ -17,6 +17,8 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.clients;
 
+import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.net.TCPChannelServer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,14 +45,16 @@ public class ClientManager {
      * The port to listen on
      */
     private int myPort;
+    
+    private ConfigManager theConfigManager;
 
     /**
-     * Set the port
-     *
-     * @param myPort the port
+     * Get the port from the config
      */
-    public ClientManager(int myPort) {
-        this.myPort = myPort;
+    public ClientManager() {
+        theConfigManager = (ConfigManager) BusinessObjectManager.getBusinessObject(ConfigManager.class.getName());
+        int port = Integer.parseInt(theConfigManager.getProperty(ClientManager.class.getName(), "TCP_LISTENING_PORT"));
+        this.myPort = port;
     }
 
     /**
