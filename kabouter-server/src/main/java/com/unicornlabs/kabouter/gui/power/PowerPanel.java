@@ -264,7 +264,7 @@ public class PowerPanel extends javax.swing.JPanel {
         dataset = new XYSeriesCollection(powerSeries);
 
         LOGGER.log(Level.INFO, "Obtaining all power logs for {0}", focus);
-        powerlogs = theHistorian.getPowerlogs(focus, start, end);
+        powerlogs = theHistorian.getPowerlogs(focus, start, end, 1000);
 
         LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
         for (Powerlog p : powerlogs) {
