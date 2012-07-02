@@ -18,6 +18,8 @@
 
 package com.unicornlabs.kabouter.devices;
 
+import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jboss.netty.channel.*;
@@ -36,6 +38,12 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
     
     static{
         LOGGER.setLevel(Level.ALL);
+    }
+    
+    private DeviceManager theDeviceManager;
+    
+    public KabouterDeviceHandler() {
+        theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
     }
 
     @Override
@@ -65,7 +73,26 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        super.messageReceived(ctx, e);
+        DeviceServerMessage message = (DeviceServerMessage) e.getMessage();
+        
+        Device theDevice = message.device;
+        
+        LOGGER.log(Level.INFO, "Handling Device Message From {0}", theDevice.getId());
+        
+        DeviceInfo deviceInfo = theDeviceManager.getDeviceInfo(theDevice.getId());
+        
+        if(deviceInfo == null) {
+            //First connection from a new device
+            LOGGER.log(Level.INFO, "Unknown Device, Creating new configuration");
+            deviceInfo = theDeviceManager.insertNewDevice(theDevice);
+        }
+        
+        if(deviceInfo.isConnected == false) {
+            //Set connected state to true
+            deviceInfo.isConnected = true;
+        }
+        
+        //handle message stuff
     }
     
     

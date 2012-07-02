@@ -18,24 +18,21 @@
 
 package com.unicornlabs.kabouter.devices;
 
-import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * DeviceServerMessage.java
+ * ServerDeviceMessage.java
  * @author Mitchell Just <mitch.just@gmail.com>
  *
  * Description:
  * TODO Add Class Description
  */
 
-public class DeviceServerMessage {
+public class ServerDeviceMessage {
 
-    private static final Logger LOGGER = Logger.getLogger(DeviceServerMessage.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ServerDeviceMessage.class.getName());
     
-    public static final String DEVICE_CONFIG = "DEVICE_CONFIG";
-    public static final String POWER_LOG = "POWER_LOG";
     public static final String IO_STATE_CHANGE = "IO_STATE_CHANGE";
     
     static{
@@ -43,7 +40,6 @@ public class DeviceServerMessage {
     }
     
     public String messageType;
-    public Device device;
     public String data;
 
 }

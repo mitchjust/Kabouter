@@ -19,6 +19,7 @@ package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.config.ConfigManager;
+import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
@@ -135,13 +136,30 @@ public class DeviceManager {
     public void addDeviceEventListener(DeviceEventListener newListener) {
         myDeviceEventListeners.add(newListener);
     }
+    
+    public void fireDeviceEvent(DeviceEvent e) {
+        for(DeviceEventListener del : myDeviceEventListeners) {
+            del.handleDeviceEvent(e);
+        }
+    }
 
     /**
      * Updates IO States on remote device
      * @param di 
      */
-    public void updateDevice(DeviceInfo di) {
+    public void updateDeviceIOState(DeviceInfo di) {
         
+    }
+    
+    public DeviceInfo insertNewDevice(Device newDevice) {
+        DeviceInfo newDeviceInfo = new DeviceInfo(newDevice);
+        myDeviceInfos.put(newDevice.getId(), newDeviceInfo);
+        theHistorian.saveDevice(newDevice);
+        
+        DeviceEvent e = new DeviceEvent(this, DeviceEvent.NEW_DEVICE_EVENT, newDeviceInfo);
+        fireDeviceEvent(e);
+        
+        return newDeviceInfo;
     }
 
 }

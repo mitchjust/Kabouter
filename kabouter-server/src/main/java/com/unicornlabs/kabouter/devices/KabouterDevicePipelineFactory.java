@@ -65,7 +65,7 @@ public class KabouterDevicePipelineFactory implements ChannelPipelineFactory{
         myPipeline.addLast("stringencoder", new StringEncoder());
 
         //Attach JSON en/decoders
-        myPipeline.addLast("jsondecoder", new JSONDecoder<ClientServerMessage>(ClientServerMessage.class));
+        myPipeline.addLast("jsondecoder", new JSONDecoder<DeviceServerMessage>(DeviceServerMessage.class));
         myPipeline.addLast("jsonencoder", new JSONEncoder());
 
         //Attach a Kabouter Client Handler at the end of the stream
