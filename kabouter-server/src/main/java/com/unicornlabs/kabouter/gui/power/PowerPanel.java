@@ -19,16 +19,27 @@ import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.awt.Cursor;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JCheckBox;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -40,6 +51,8 @@ public class PowerPanel extends javax.swing.JPanel {
 
     private static final Logger LOGGER = Logger.getLogger(PowerPanel.class.getName());
     private static final int MAX_DATA_POINTS = 1000;
+    private boolean liveStatus;
+    private Historian theHistorian;
 
     static {
         LOGGER.setLevel(Level.ALL);
@@ -51,6 +64,7 @@ public class PowerPanel extends javax.swing.JPanel {
      */
     public PowerPanel() {
         initComponents();
+        theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
     }
     private JFreeChart myChart;
     private XYSeries powerSeries;
@@ -101,6 +115,7 @@ public class PowerPanel extends javax.swing.JPanel {
         endTimeSpinner = new com.unicornlabs.kabouter.gui.components.JTimeSpinner();
         jLabel3 = new javax.swing.JLabel();
         applyButton = new javax.swing.JButton();
+        liveCheckBox = new javax.swing.JCheckBox();
 
         deviceComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -134,6 +149,13 @@ public class PowerPanel extends javax.swing.JPanel {
             }
         });
 
+        liveCheckBox.setText("Live");
+        liveCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                liveCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -159,7 +181,8 @@ public class PowerPanel extends javax.swing.JPanel {
                                 .addComponent(jLabel3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(endTimeSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(endDateChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(endDateChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(liveCheckBox))
                             .addComponent(applyButton, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
@@ -187,7 +210,9 @@ public class PowerPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(endTimeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(endDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(endDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(liveCheckBox)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -199,45 +224,72 @@ public class PowerPanel extends javax.swing.JPanel {
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime((Date) startTimeSpinner.getValue());
+        liveStatus = liveCheckBox.isSelected();
 
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int min = cal.get(Calendar.MINUTE);
-        int sec = cal.get(Calendar.SECOND);
+        if (liveStatus == true) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime((Date) startTimeSpinner.getValue());
 
-        cal.setTime(startDateChooser.getDate());
+            int hour = cal.get(Calendar.HOUR_OF_DAY);
+            int min = cal.get(Calendar.MINUTE);
+            int sec = cal.get(Calendar.SECOND);
 
-        cal.set(Calendar.HOUR_OF_DAY, hour);
-        cal.set(Calendar.MINUTE, min);
-        cal.set(Calendar.SECOND, sec);
+            cal.setTime(startDateChooser.getDate());
 
-        Date start = cal.getTime();
+            cal.set(Calendar.HOUR_OF_DAY, hour);
+            cal.set(Calendar.MINUTE, min);
+            cal.set(Calendar.SECOND, sec);
 
-        cal.setTime((Date) endTimeSpinner.getValue());
+            Date start = cal.getTime();
 
-        hour = cal.get(Calendar.HOUR_OF_DAY);
-        min = cal.get(Calendar.MINUTE);
-        sec = cal.get(Calendar.SECOND);
 
-        cal.setTime(endDateChooser.getDate());
+        } else {
 
-        cal.set(Calendar.HOUR_OF_DAY, hour);
-        cal.set(Calendar.MINUTE, min);
-        cal.set(Calendar.SECOND, sec);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime((Date) startTimeSpinner.getValue());
 
-        Date end = cal.getTime();
+            int hour = cal.get(Calendar.HOUR_OF_DAY);
+            int min = cal.get(Calendar.MINUTE);
+            int sec = cal.get(Calendar.SECOND);
 
-        System.out.println("start = " + start);
-        System.out.println("end = " + end);
+            cal.setTime(startDateChooser.getDate());
 
-        String graphfocus = (String) deviceComboBox.getSelectedItem();
+            cal.set(Calendar.HOUR_OF_DAY, hour);
+            cal.set(Calendar.MINUTE, min);
+            cal.set(Calendar.SECOND, sec);
 
-        updateChart(graphfocus, start, end);
+            Date start = cal.getTime();
+
+            cal.setTime((Date) endTimeSpinner.getValue());
+
+            hour = cal.get(Calendar.HOUR_OF_DAY);
+            min = cal.get(Calendar.MINUTE);
+            sec = cal.get(Calendar.SECOND);
+
+            cal.setTime(endDateChooser.getDate());
+
+            cal.set(Calendar.HOUR_OF_DAY, hour);
+            cal.set(Calendar.MINUTE, min);
+            cal.set(Calendar.SECOND, sec);
+
+            Date end = cal.getTime();
+
+            String graphfocus = (String) deviceComboBox.getSelectedItem();
+
+            ArrayList<Powerlog> logs = theHistorian.getPowerlogs(graphfocus, start, end, 1000);
+            
+            setupChart(logs, graphfocus, start, end);
+        }
 
         setCursor(Cursor.getDefaultCursor());
 
     }//GEN-LAST:event_applyButtonActionPerformed
+
+    private void liveCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_liveCheckBoxActionPerformed
+        JCheckBox source = (JCheckBox) evt.getSource();
+        endTimeSpinner.setEnabled(!source.isSelected());
+        endDateChooser.setEnabled(!source.isSelected());
+    }//GEN-LAST:event_liveCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
     private javax.swing.JPanel chartPanel;
@@ -247,6 +299,7 @@ public class PowerPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JCheckBox liveCheckBox;
     private com.toedter.calendar.JDateChooser startDateChooser;
     private com.unicornlabs.kabouter.gui.components.JTimeSpinner startTimeSpinner;
     // End of variables declaration//GEN-END:variables
@@ -255,9 +308,42 @@ public class PowerPanel extends javax.swing.JPanel {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    public boolean getLiveStatus() {
+        return liveStatus;
+    }
+
+    public void setupChart(ArrayList<Powerlog> logs, String title, Date from, Date to) {
+        powerSeries = new XYSeries(title);
+        dataset = new XYSeriesCollection(powerSeries);
+
+        for (Powerlog p : logs) {
+            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
+        }
+
+        DateAxis dateAxis = new DateAxis("Date");
+
+        dateAxis.setMaximumDate(to);
+        dateAxis.setMinimumDate(from);
+        dateAxis.setVerticalTickLabels(true);
+
+        NumberAxis powerAxis = new NumberAxis("Power");
+
+        StandardXYToolTipGenerator ttg = new StandardXYToolTipGenerator(
+                "{0}: {2}", new SimpleDateFormat("yyyy/MM/dd HH:mm"), NumberFormat.getInstance());
+
+
+        StandardXYItemRenderer renderer = new StandardXYItemRenderer(
+                StandardXYItemRenderer.LINES, ttg, null);
+
+        XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
+        
+        myChart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+        
+        ((ChartPanel) chartPanel).setChart(myChart);
+    }
+
     //TODO fix this to actually work - Consider live case
     public void updateChart(String focus, Date start, Date end) {
-        Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         ArrayList<Powerlog> powerlogs;
 
         powerSeries = new XYSeries("First");

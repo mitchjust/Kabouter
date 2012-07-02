@@ -43,6 +43,7 @@
                                   <Component id="endTimeSpinner" alignment="0" max="32767" attributes="0"/>
                                   <Component id="endDateChooser" alignment="0" min="-2" pref="145" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="liveCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="applyButton" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -79,6 +80,8 @@
                       <Component id="endTimeSpinner" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="endDateChooser" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="liveCheckBox" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -161,6 +164,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="applyButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="liveCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Live"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="liveCheckBoxActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
