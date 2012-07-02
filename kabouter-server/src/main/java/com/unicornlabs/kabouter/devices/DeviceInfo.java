@@ -22,6 +22,7 @@ import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jboss.netty.channel.Channel;
 
 /**
  * DeviceInfo.java
@@ -68,6 +69,8 @@ public class DeviceInfo implements Serializable {
      * The status of the io
      */
     public Integer[] ioStates;
+    
+    public Channel tcpChannel;
 
     /**
      * Debugging String output

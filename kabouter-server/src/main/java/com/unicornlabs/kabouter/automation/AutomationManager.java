@@ -20,6 +20,8 @@ package com.unicornlabs.kabouter.automation;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.DeviceInfo;
 import com.unicornlabs.kabouter.devices.DeviceManager;
+import com.unicornlabs.kabouter.devices.events.DeviceEvent;
+import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  *
  * Description: Controls the automation features
  */
-public class AutomationManager {
+public class AutomationManager implements DeviceEventListener{
 
     private static final Logger LOGGER = Logger.getLogger(AutomationManager.class.getName());
 
@@ -58,6 +60,19 @@ public class AutomationManager {
         di.ioStates[ioNum] = value;
         
         theDeviceManager.updateDeviceIOState(di);
+    }
+
+    @Override
+    public void handleDeviceEvent(DeviceEvent e) {
+        if(e.getEventType().equals(DeviceEvent.IO_CHANGE_EVENT)) {
+            DeviceInfo theDeviceInfo = (DeviceInfo) e.getAttachment();
+            LOGGER.log(Level.INFO, "Handling IO Change Event for Device {0}", theDeviceInfo.theDevice.getId());
+            
+            //TODO Remove this, test case only
+            theDeviceInfo.ioStates = new Integer[]{(1-theDeviceInfo.ioStates[0]),(1-theDeviceInfo.ioStates[0])};
+            
+            theDeviceManager.updateDeviceIOState(theDeviceInfo);
+        }
     }
     
 }

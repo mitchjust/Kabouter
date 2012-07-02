@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter;
 
+import com.unicornlabs.kabouter.automation.AutomationManager;
 import com.unicornlabs.kabouter.clients.ClientManager;
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
@@ -95,6 +96,13 @@ public class KabouterServerMain {
             BusinessObjectManager.registerBusinessObject(ClientManager.class.getName(), theClientManager);
             mySplashScreen.addText("Done!\n");
 
+            //Setup the Automation Manager
+            mySplashScreen.addText("Starting Automation Manager Service...");
+            AutomationManager theAutomationManager = new AutomationManager();
+            theDeviceManager.addDeviceEventListener(theAutomationManager);
+            BusinessObjectManager.registerBusinessObject(AutomationManager.class.getName(), theAutomationManager);
+            mySplashScreen.addText("Done!\n");
+            
             //Start the GUI Manager in the Swing Initializer Thread
             mySplashScreen.addText("Starting GUI Manager...");
 

@@ -126,10 +126,9 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
             @Override
             public void run() {
 
-                final DeviceInfo theDeviceInfo = (DeviceInfo) e.getSource();
-
                 if (e.getEventType().equals(DeviceEvent.NEW_DEVICE_EVENT)) {
-                } else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
+                } 
+                else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
                     //Actions for New Power Logs
                     if (myMainFrame.getCurrentTab() == myPowerPanel) {
                         //Action for power panel

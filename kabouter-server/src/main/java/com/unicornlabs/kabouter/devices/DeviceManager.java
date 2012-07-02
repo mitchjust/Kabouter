@@ -24,6 +24,7 @@ import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.net.TCPChannelServer;
+import com.unicornlabs.kabouter.util.JSONUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,6 +138,10 @@ public class DeviceManager {
         myDeviceEventListeners.add(newListener);
     }
     
+    /**
+     * Fires the event handling method of each of the listeners
+     * @param e 
+     */
     public void fireDeviceEvent(DeviceEvent e) {
         for(DeviceEventListener del : myDeviceEventListeners) {
             del.handleDeviceEvent(e);
@@ -144,15 +149,15 @@ public class DeviceManager {
     }
 
     /**
-     * Updates IO States on remote device
-     * @param di 
+     * Inserts a new device to the database and returns the new deviceinfo
+     * @param newDevice the device details
+     * @return the deviceinfo object
      */
-    public void updateDeviceIOState(DeviceInfo di) {
-        
-    }
-    
     public DeviceInfo insertNewDevice(Device newDevice) {
         DeviceInfo newDeviceInfo = new DeviceInfo(newDevice);
+        
+        LOGGER.log(Level.INFO, "Added new DeviceInfo: \n{0}", newDeviceInfo);
+        
         myDeviceInfos.put(newDevice.getId(), newDeviceInfo);
         theHistorian.saveDevice(newDevice);
         
@@ -160,6 +165,13 @@ public class DeviceManager {
         fireDeviceEvent(e);
         
         return newDeviceInfo;
+    }
+
+    public void updateDeviceIOState(DeviceInfo di) {
+        ServerDeviceMessage newMessage = new ServerDeviceMessage();
+        newMessage.messageType = ServerDeviceMessage.IO_STATE_CHANGE;
+        newMessage.data = JSONUtils.ToJSON(di.ioStates);
+        di.tcpChannel.write(newMessage);
     }
 
 }

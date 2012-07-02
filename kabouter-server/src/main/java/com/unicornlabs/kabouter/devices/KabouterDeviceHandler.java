@@ -19,7 +19,13 @@
 package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.devices.events.DeviceEvent;
+import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
+import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
+import com.unicornlabs.kabouter.util.JSONUtils;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jboss.netty.channel.*;
@@ -41,9 +47,11 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
     }
     
     private DeviceManager theDeviceManager;
+    private Historian theHistorian;
     
     public KabouterDeviceHandler() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
     }
 
     @Override
@@ -58,7 +66,12 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        super.exceptionCaught(ctx, e);
+        DeviceInfo deviceInfo = (DeviceInfo) ctx.getAttachment();
+        Device device = deviceInfo.theDevice;
+        LOGGER.log(Level.SEVERE, "Exception Caught for Device {0}:\n{1}", new Object[]{device.getId(), e.getCause().getMessage()});
+        deviceInfo.isConnected = false;
+        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceInfo);
+        theDeviceManager.fireDeviceEvent(newDeviceEvent);
     }
 
     @Override
@@ -90,9 +103,34 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
         if(deviceInfo.isConnected == false) {
             //Set connected state to true
             deviceInfo.isConnected = true;
+            //Attach the channel
+            deviceInfo.tcpChannel = ctx.getChannel();
+            
+            //Attach the device to the channel context
+            ctx.setAttachment(deviceInfo);
         }
         
         //handle message stuff
+        
+        if(message.messageType.contentEquals(DeviceServerMessage.IO_STATE_CHANGE)) {
+            Integer[] newIOStates = JSONUtils.FromJSON(message.data, Integer[].class);
+            deviceInfo.ioStates = newIOStates;
+            
+            DeviceEvent deviceIOEvent = new DeviceEvent(theDeviceManager, DeviceEvent.IO_CHANGE_EVENT, deviceInfo);
+            
+            theDeviceManager.fireDeviceEvent(deviceIOEvent);
+        }
+        else if(message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
+            Double power = JSONUtils.FromJSON(message.data, Double.class);
+            
+            Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), theDevice.getId()), (double)power);
+            
+            theHistorian.savePowerlog(newPowerlog);
+            
+            DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
+            
+            theDeviceManager.fireDeviceEvent(devicePowerEvent);
+        }
     }
     
     

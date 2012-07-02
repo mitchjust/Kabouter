@@ -17,6 +17,7 @@ package com.unicornlabs.kabouter.gui.debug;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.historian.Historian;
+import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
@@ -63,6 +64,8 @@ public class DebugPanel extends javax.swing.JPanel {
         historianDataButton = new javax.swing.JButton();
         historianDataDeviceIdTextField = new javax.swing.JTextField();
         historianDataEntriesTextField = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
+        clearDevicesButton = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -87,6 +90,13 @@ public class DebugPanel extends javax.swing.JPanel {
 
         historianDataEntriesTextField.setText("0");
 
+        clearDevicesButton.setText("Clear All Devices");
+        clearDevicesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearDevicesButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -94,26 +104,31 @@ public class DebugPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addComponent(jSeparator1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(historianDataDeviceIdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
-                            .addComponent(historianDataEntriesTextField))
-                        .addGap(18, 18, 18)
-                        .addComponent(historianDataButton)))
-                .addContainerGap(432, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(historianDataDeviceIdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
+                                    .addComponent(historianDataEntriesTextField))
+                                .addGap(18, 18, 18)
+                                .addComponent(historianDataButton))
+                            .addComponent(clearDevicesButton)
+                            .addComponent(jLabel1))
+                        .addGap(0, 422, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(historianDataDeviceIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -122,7 +137,11 @@ public class DebugPanel extends javax.swing.JPanel {
                     .addComponent(jLabel3)
                     .addComponent(historianDataEntriesTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(historianDataButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(clearDevicesButton)
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -139,7 +158,7 @@ public class DebugPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(475, Short.MAX_VALUE))
+                .addContainerGap(347, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -177,7 +196,23 @@ public class DebugPanel extends javax.swing.JPanel {
         this.setEnabled(true);
 
     }//GEN-LAST:event_historianDataButtonActionPerformed
+
+    private void clearDevicesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearDevicesButtonActionPerformed
+        int showConfirmDialog = JOptionPane.showConfirmDialog(this, "Really Delete All Device Logs?", "Confirmation", JOptionPane.OK_CANCEL_OPTION);
+        
+        if(showConfirmDialog == JOptionPane.CANCEL_OPTION) {
+            return;
+        }
+        
+        Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+        ArrayList<Device> devices = theHistorian.getDevices();
+        for(Device d : devices) {
+            theHistorian.deleteDevice(d);
+        }
+    }//GEN-LAST:event_clearDevicesButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clearDevicesButton;
     private javax.swing.JButton historianDataButton;
     private javax.swing.JTextField historianDataDeviceIdTextField;
     private javax.swing.JTextField historianDataEntriesTextField;
@@ -186,5 +221,6 @@ public class DebugPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }
