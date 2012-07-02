@@ -29,13 +29,15 @@
                               </Group>
                               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                               <Component id="deviceComboBox" min="-2" pref="152" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="liveCheckBox" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
                               <Component id="startTimeSpinner" alignment="0" max="32767" attributes="0"/>
                               <Component id="startDateChooser" alignment="0" pref="145" max="32767" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="452" max="32767" attributes="0"/>
+                      <EmptySpace pref="401" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="103" alignment="1" groupAlignment="0" attributes="0">
                               <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -43,7 +45,6 @@
                                   <Component id="endTimeSpinner" alignment="0" max="32767" attributes="0"/>
                                   <Component id="endDateChooser" alignment="0" min="-2" pref="145" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="liveCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="applyButton" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -71,6 +72,7 @@
                           <Component id="deviceComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="applyButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="liveCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -80,8 +82,6 @@
                       <Component id="endTimeSpinner" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="endDateChooser" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="liveCheckBox" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>

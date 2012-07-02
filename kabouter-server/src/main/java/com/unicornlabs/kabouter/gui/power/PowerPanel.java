@@ -16,10 +16,10 @@
 package com.unicornlabs.kabouter.gui.power;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.awt.Cursor;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,15 +29,11 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.data.xy.XYSeries;
@@ -51,8 +47,14 @@ public class PowerPanel extends javax.swing.JPanel {
 
     private static final Logger LOGGER = Logger.getLogger(PowerPanel.class.getName());
     private static final int MAX_DATA_POINTS = 1000;
+    private static final int MAX_DATA_POINTS_LIVE = 100;
     private boolean liveStatus;
     private Historian theHistorian;
+    private DeviceManager theDeviceManager;
+    private String currentFocus;
+    private JFreeChart myChart;
+    private XYSeries powerSeries;
+    private XYSeriesCollection dataset;
 
     static {
         LOGGER.setLevel(Level.ALL);
@@ -65,33 +67,76 @@ public class PowerPanel extends javax.swing.JPanel {
     public PowerPanel() {
         initComponents();
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+        theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getCanonicalName());
     }
-    private JFreeChart myChart;
-    private XYSeries powerSeries;
-    private XYSeriesCollection dataset;
 
     public void updateDeviceList() {
         deviceComboBox.setEnabled(false);
+        Object selectedItem = deviceComboBox.getSelectedItem();
+        
         deviceComboBox.removeAllItems();
 
         deviceComboBox.addItem(TOTAL_POWER);
+        
+        ArrayList<String> deviceIds = theDeviceManager.getDeviceIds();
 
-        Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
-        ArrayList<String> powerLogDeviceIds = theHistorian.getPowerLogDeviceIds();
+        Collections.sort(deviceIds);
 
-        Collections.sort(powerLogDeviceIds);
-
-        for (String s : powerLogDeviceIds) {
+        for (String s : deviceIds) {
             deviceComboBox.addItem(s);
         }
 
-        deviceComboBox.setSelectedIndex(0);
+        //Reset the selected item
+        deviceComboBox.setSelectedItem(selectedItem);
         deviceComboBox.setEnabled(true);
     }
 
     public String getSelectedDevice() {
         return (String) deviceComboBox.getSelectedItem();
 
+    }
+    
+    public void handleNewPowerLog(Powerlog newLog) {
+        if (newLog.getId().getDeviceid().contentEquals(currentFocus)) {
+            LOGGER.log(Level.INFO, "Adding new Power Log: {0}", newLog.getPower());
+            powerSeries.add(newLog.getId().getLogtime().getTime(), newLog.getPower());
+        }
+    }
+
+    public boolean getLiveStatus() {
+        return liveStatus;
+    }
+
+    public void setupChart(ArrayList<Powerlog> logs, String title) {
+        powerSeries = new XYSeries(title);
+        dataset = new XYSeriesCollection(powerSeries);
+
+        for (Powerlog p : logs) {
+            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
+        }
+
+        DateAxis dateAxis = new DateAxis("Date");
+
+        dateAxis.setMaximumDate(logs.get(logs.size()-1).getId().getLogtime());
+        dateAxis.setMinimumDate(logs.get(0).getId().getLogtime());
+        dateAxis.setVerticalTickLabels(true);
+
+        NumberAxis powerAxis = new NumberAxis("Power");
+        //powerAxis.setAutoRange(true);
+        //dateAxis.setAutoRange(true);
+
+        StandardXYToolTipGenerator ttg = new StandardXYToolTipGenerator(
+                "{0}: {2}", new SimpleDateFormat("yyyy/MM/dd HH:mm"), NumberFormat.getInstance());
+
+
+        StandardXYItemRenderer renderer = new StandardXYItemRenderer(
+                StandardXYItemRenderer.LINES, ttg, null);
+
+        XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
+
+        myChart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+
+        ((ChartPanel) chartPanel).setChart(myChart);
     }
 
     /**
@@ -171,18 +216,19 @@ public class PowerPanel extends javax.swing.JPanel {
                                     .addComponent(jLabel1)
                                     .addComponent(jLabel2))
                                 .addGap(15, 15, 15)
-                                .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(liveCheckBox))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(startTimeSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(startDateChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 452, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 401, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(endTimeSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(endDateChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(liveCheckBox))
+                                    .addComponent(endDateChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(applyButton, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
@@ -203,16 +249,15 @@ public class PowerPanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(deviceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1)
-                            .addComponent(applyButton)))
+                            .addComponent(applyButton)
+                            .addComponent(liveCheckBox)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(endTimeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(endDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(liveCheckBox)))
+                        .addComponent(endDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -225,22 +270,18 @@ public class PowerPanel extends javax.swing.JPanel {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
         liveStatus = liveCheckBox.isSelected();
+        currentFocus = (String) deviceComboBox.getSelectedItem();
 
         if (liveStatus == true) {
             Calendar cal = Calendar.getInstance();
-            cal.setTime((Date) startTimeSpinner.getValue());
+            Date currentDate = new Date();
+            cal.setTime(currentDate);
+            cal.add(Calendar.SECOND, -1000);
+            Date startDate = cal.getTime();
 
-            int hour = cal.get(Calendar.HOUR_OF_DAY);
-            int min = cal.get(Calendar.MINUTE);
-            int sec = cal.get(Calendar.SECOND);
+            ArrayList<Powerlog> logs = theHistorian.getPowerlogs(currentFocus, startDate, currentDate, MAX_DATA_POINTS_LIVE);
 
-            cal.setTime(startDateChooser.getDate());
-
-            cal.set(Calendar.HOUR_OF_DAY, hour);
-            cal.set(Calendar.MINUTE, min);
-            cal.set(Calendar.SECOND, sec);
-
-            Date start = cal.getTime();
+            setupChart(logs, "Live Power for " + currentFocus);
 
 
         } else {
@@ -274,11 +315,9 @@ public class PowerPanel extends javax.swing.JPanel {
 
             Date end = cal.getTime();
 
-            String graphfocus = (String) deviceComboBox.getSelectedItem();
+            ArrayList<Powerlog> logs = theHistorian.getPowerlogs(currentFocus, start, end, MAX_DATA_POINTS);
 
-            ArrayList<Powerlog> logs = theHistorian.getPowerlogs(graphfocus, start, end, 1000);
-            
-            setupChart(logs, graphfocus, start, end);
+            setupChart(logs, currentFocus);
         }
 
         setCursor(Cursor.getDefaultCursor());
@@ -289,6 +328,8 @@ public class PowerPanel extends javax.swing.JPanel {
         JCheckBox source = (JCheckBox) evt.getSource();
         endTimeSpinner.setEnabled(!source.isSelected());
         endDateChooser.setEnabled(!source.isSelected());
+        startTimeSpinner.setEnabled(!source.isSelected());
+        startDateChooser.setEnabled(!source.isSelected());
     }//GEN-LAST:event_liveCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
@@ -304,64 +345,4 @@ public class PowerPanel extends javax.swing.JPanel {
     private com.unicornlabs.kabouter.gui.components.JTimeSpinner startTimeSpinner;
     // End of variables declaration//GEN-END:variables
 
-    public void handleNewPowerLog(Powerlog newLog) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public boolean getLiveStatus() {
-        return liveStatus;
-    }
-
-    public void setupChart(ArrayList<Powerlog> logs, String title, Date from, Date to) {
-        powerSeries = new XYSeries(title);
-        dataset = new XYSeriesCollection(powerSeries);
-
-        for (Powerlog p : logs) {
-            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
-        }
-
-        DateAxis dateAxis = new DateAxis("Date");
-
-        dateAxis.setMaximumDate(to);
-        dateAxis.setMinimumDate(from);
-        dateAxis.setVerticalTickLabels(true);
-
-        NumberAxis powerAxis = new NumberAxis("Power");
-
-        StandardXYToolTipGenerator ttg = new StandardXYToolTipGenerator(
-                "{0}: {2}", new SimpleDateFormat("yyyy/MM/dd HH:mm"), NumberFormat.getInstance());
-
-
-        StandardXYItemRenderer renderer = new StandardXYItemRenderer(
-                StandardXYItemRenderer.LINES, ttg, null);
-
-        XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
-        
-        myChart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
-        
-        ((ChartPanel) chartPanel).setChart(myChart);
-    }
-
-    //TODO fix this to actually work - Consider live case
-    public void updateChart(String focus, Date start, Date end) {
-        ArrayList<Powerlog> powerlogs;
-
-        powerSeries = new XYSeries("First");
-        dataset = new XYSeriesCollection(powerSeries);
-
-        LOGGER.log(Level.INFO, "Obtaining all power logs for {0}", focus);
-        powerlogs = theHistorian.getPowerlogs(focus, start, end, 1000);
-
-        LOGGER.log(Level.INFO, "Got {0} Power Logs", powerlogs.size());
-        for (Powerlog p : powerlogs) {
-            powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
-        }
-
-
-        LOGGER.log(Level.INFO, "Added {0} Data Items", powerSeries.getItemCount());
-
-        myChart = ChartFactory.createXYLineChart("Power Usage For " + focus, "Date", "Power", dataset, PlotOrientation.VERTICAL, true, true, true);
-
-        ((ChartPanel) chartPanel).setChart(myChart);
-    }
 }

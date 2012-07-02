@@ -61,7 +61,7 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
 
         //Get device mangaer
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
-        
+
         //Setup main frame
         myMainFrame = new MainFrame();
         myMainFrame.setLocationRelativeTo(null);
@@ -127,18 +127,25 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
             public void run() {
 
                 if (e.getEventType().equals(DeviceEvent.NEW_DEVICE_EVENT)) {
-                } 
-                else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
                     //Actions for New Power Logs
                     if (myMainFrame.getCurrentTab() == myPowerPanel) {
                         //Action for power panel
-                        Powerlog newLog = (Powerlog) e.getAttachment();
-                        myPowerPanel.handleNewPowerLog(newLog);
+                        myPowerPanel.updateDeviceList();
+                    }
+                } else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
+                    //Actions for New Power Logs
+                    if (myMainFrame.getCurrentTab() == myPowerPanel) {
+                        //Action for power panel
+                        
+                        //If the power panel is in live mode, update it
+                        if (myPowerPanel.getLiveStatus() == true) {
+                            Powerlog newLog = (Powerlog) e.getAttachment();
+                            myPowerPanel.handleNewPowerLog(newLog);
+                        }
                     }
                 }
             }
         });
 
     }
-    
 }

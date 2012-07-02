@@ -174,4 +174,15 @@ public class DeviceManager {
         di.tcpChannel.write(newMessage);
     }
 
+    public ArrayList<String> getDeviceIds() {
+        ArrayList<String> deviceIds = new ArrayList<String>();
+        DeviceInfo[] deviceInfos = getDeviceInfos();
+        
+        for(DeviceInfo di : deviceInfos) {
+            deviceIds.add(di.theDevice.getId());
+        }
+        
+        return deviceIds;
+    }
+
 }

@@ -199,6 +199,7 @@ public class Historian {
 
     /**
      * Returns data sampled at regular intervals between two dates
+     *
      * @param deviceId the device id
      * @param from the first date
      * @param to the last date
@@ -206,37 +207,37 @@ public class Historian {
      * @return the logs
      */
     public ArrayList<Powerlog> getPowerlogs(String deviceId, Date from, Date to, int maxNumRecords) {
-        ArrayList<Powerlog> preparedData = new ArrayList<Powerlog>();        
+        ArrayList<Powerlog> preparedData = new ArrayList<Powerlog>();
 
         ArrayList<Powerlog> rawData = getPowerlogs(deviceId, from, to);
-        
+
         /**
          * For no logs case, add a zero log at the start and finish
          */
-        if(rawData.isEmpty()) {
+        if (rawData.isEmpty()) {
             Powerlog startLog = new Powerlog(new PowerlogId(from, deviceId), 0d);
             Powerlog endLog = new Powerlog(new PowerlogId(to, deviceId), 0d);
-            
+
             preparedData.add(startLog);
             preparedData.add(endLog);
-            
+
             return preparedData;
         }
-        
+
         /**
          * Adjust is the number or records is less than the requested count
          */
-        if(rawData.size() < maxNumRecords) {
+        if (rawData.size() < maxNumRecords) {
             maxNumRecords = rawData.size();
         }
-        
+
         //Get the sampling interval
         long dateDifference = to.getTime() - from.getTime();
         long dateInterval = dateDifference / maxNumRecords;
-        
+
         //Set the first sample to the first date
-        long sampleDate = from.getTime();
-        
+        long sampleDate = rawData.get(0).getId().getLogtime().getTime();
+
         //Start from the first log
         int logIndex = 0;
 
@@ -248,22 +249,23 @@ public class Historian {
             //The last sample date is half of the interval after the sample date
             long sampleTo = sampleDate + dateInterval / 2;
             Date sampleToDate = new Date(sampleTo);
-            
+
             double samplePower = getAveragePower(rawData, sampleFromDate, sampleToDate);
-            
+
             Powerlog newLog = new Powerlog(new PowerlogId(new Date(sampleDate), deviceId), samplePower);
-            
             preparedData.add(newLog);
+
 
             //Increment sample date
             sampleDate += dateInterval;
         }
-        
+
         return preparedData;
     }
-    
+
     /**
      * Gets the average power between two dates in a list of power logs
+     *
      * @param logs the list of logs
      * @param from the start date
      * @param to the end date
@@ -272,13 +274,13 @@ public class Historian {
     public double getAveragePower(ArrayList<Powerlog> logs, Date from, Date to) {
         double avgPower = 0;
         int count = 0;
-        
+
         //For each log
-        for(Powerlog log : logs) {
+        for (Powerlog log : logs) {
             //If the date is or is after the start date
-            if(log.getId().getLogtime().compareTo(from) >= 0) {
+            if (log.getId().getLogtime().compareTo(from) >= 0) {
                 //Break if we have gone past the end date
-                if(log.getId().getLogtime().compareTo(to) > 0) {
+                if (log.getId().getLogtime().compareTo(to) > 0) {
                     break;
                 }
                 //Sum the power
@@ -286,11 +288,11 @@ public class Historian {
                 count++;
             }
         }
-        
+
         //Divide by count
-        return avgPower/count;
+        return avgPower / count;
     }
-    
+
     /**
      * Returns all power logs from all devices between a date range
      *
