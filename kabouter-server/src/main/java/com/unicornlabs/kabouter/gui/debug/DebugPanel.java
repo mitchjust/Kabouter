@@ -16,6 +16,7 @@
 package com.unicornlabs.kabouter.gui.debug;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
+import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
@@ -168,7 +169,16 @@ public class DebugPanel extends javax.swing.JPanel {
             int entries = Integer.parseInt(historianDataEntriesTextField.getText());
             String deviceId = historianDataDeviceIdTextField.getText();
             Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+            DeviceManager theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+            
             Calendar theCalendar = Calendar.getInstance();
+            
+            Device newDevice = new Device(deviceId, "1.1.1.1");
+            newDevice.setHaspowerlogging(Boolean.TRUE);
+            newDevice.setNumio(0);
+            
+            
+            theDeviceManager.insertNewDevice(newDevice);
             
             Random r = new Random(); 
             ArrayList<Powerlog> powerlogs = new ArrayList<Powerlog>();

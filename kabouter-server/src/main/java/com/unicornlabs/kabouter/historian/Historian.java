@@ -215,6 +215,7 @@ public class Historian {
          * For no logs case, add a zero log at the start and finish
          */
         if (rawData.isEmpty()) {
+            LOGGER.info("No Logs Returned");
             Powerlog startLog = new Powerlog(new PowerlogId(from, deviceId), 0d);
             Powerlog endLog = new Powerlog(new PowerlogId(to, deviceId), 0d);
 
@@ -228,6 +229,7 @@ public class Historian {
          * Adjust is the number or records is less than the requested count
          */
         if (rawData.size() < maxNumRecords) {
+            LOGGER.log(Level.INFO, "Resizing Request to {0}", rawData.size());
             maxNumRecords = rawData.size();
         }
 
@@ -236,7 +238,7 @@ public class Historian {
         long dateInterval = dateDifference / maxNumRecords;
 
         //Set the first sample to the first date
-        long sampleDate = rawData.get(0).getId().getLogtime().getTime();
+        long sampleDate = from.getTime();
 
         //Start from the first log
         int logIndex = 0;
@@ -245,9 +247,16 @@ public class Historian {
         for (int i = 0; i < maxNumRecords; i++) {
             //The first sample date is half of the interval before the sample date
             long sampleFrom = sampleDate - dateInterval / 2;
+            if (sampleFrom < from.getTime()) {
+                sampleFrom = from.getTime();
+            }
             Date sampleFromDate = new Date(sampleFrom);
             //The last sample date is half of the interval after the sample date
             long sampleTo = sampleDate + dateInterval / 2;
+            if (sampleTo > to.getTime()) {
+                sampleTo = to.getTime();
+            }
+
             Date sampleToDate = new Date(sampleTo);
 
             double samplePower = getAveragePower(rawData, sampleFromDate, sampleToDate);
@@ -290,7 +299,11 @@ public class Historian {
         }
 
         //Divide by count
-        return avgPower / count;
+        if (count != 0) {
+            return avgPower / count;
+        } else {
+            return 0;
+        }
     }
 
     /**

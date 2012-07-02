@@ -47,7 +47,7 @@ public class PowerPanel extends javax.swing.JPanel {
 
     private static final Logger LOGGER = Logger.getLogger(PowerPanel.class.getName());
     private static final int MAX_DATA_POINTS = 1000;
-    private static final int MAX_DATA_POINTS_LIVE = 100;
+    private static final int MAX_DATA_POINTS_LIVE = 200;
     private boolean liveStatus;
     private Historian theHistorian;
     private DeviceManager theDeviceManager;
@@ -70,18 +70,26 @@ public class PowerPanel extends javax.swing.JPanel {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getCanonicalName());
     }
 
+    /**
+     * Updates the list of devices
+     */
     public void updateDeviceList() {
         deviceComboBox.setEnabled(false);
+        //Save the currently selected item
         Object selectedItem = deviceComboBox.getSelectedItem();
-        
+
         deviceComboBox.removeAllItems();
 
+        //Add the total power item
         deviceComboBox.addItem(TOTAL_POWER);
-        
+
+        //Get the device ids from the device manager
         ArrayList<String> deviceIds = theDeviceManager.getDeviceIds();
 
+        //Sort them alphabetically
         Collections.sort(deviceIds);
 
+        //Add them to the combo box
         for (String s : deviceIds) {
             deviceComboBox.addItem(s);
         }
@@ -91,52 +99,94 @@ public class PowerPanel extends javax.swing.JPanel {
         deviceComboBox.setEnabled(true);
     }
 
+    /**
+     * Get the selected device
+     *
+     * @return the selected device
+     */
     public String getSelectedDevice() {
         return (String) deviceComboBox.getSelectedItem();
 
     }
-    
+
+    /**
+     *
+     * @param newLog
+     */
     public void handleNewPowerLog(Powerlog newLog) {
+        //If the new log is from the currently focussed device
         if (newLog.getId().getDeviceid().contentEquals(currentFocus)) {
-            LOGGER.log(Level.INFO, "Adding new Power Log: {0}", newLog.getPower());
+            //Add the new datapoint
             powerSeries.add(newLog.getId().getLogtime().getTime(), newLog.getPower());
+
+            //While we have too many data points for a live graph
+            while ((long) (newLog.getId().getLogtime().getTime() - powerSeries.getMinX()) > MAX_DATA_POINTS_LIVE * 1000) {
+                //Remove the first data point
+                powerSeries.remove(0);
+            }
+
         }
     }
 
+    /**
+     * Returns true if the panel is in live mode
+     *
+     * @return the status
+     */
     public boolean getLiveStatus() {
         return liveStatus;
     }
 
+    /**
+     * Sets the chart data and title
+     *
+     * @param logs the list of power logs
+     * @param title the title of the chart
+     */
     public void setupChart(ArrayList<Powerlog> logs, String title) {
+        //Create a new XY Series to hold power values
         powerSeries = new XYSeries(title);
+
+        //Create a collection to store the series
         dataset = new XYSeriesCollection(powerSeries);
 
+        //Add each of the logs to the series
         for (Powerlog p : logs) {
             powerSeries.add(p.getId().getLogtime().getTime(), p.getPower());
         }
 
+        //Create a custom date axis to display dates on the X axis
         DateAxis dateAxis = new DateAxis("Date");
-
-        dateAxis.setMaximumDate(logs.get(logs.size()-1).getId().getLogtime());
-        dateAxis.setMinimumDate(logs.get(0).getId().getLogtime());
+        //Make the labels vertical
         dateAxis.setVerticalTickLabels(true);
 
+        //Create the power axis
         NumberAxis powerAxis = new NumberAxis("Power");
-        //powerAxis.setAutoRange(true);
-        //dateAxis.setAutoRange(true);
 
+        //Set both axes to auto range for their values
+        powerAxis.setAutoRange(true);
+        dateAxis.setAutoRange(true);
+
+        //Create the tooltip generator
         StandardXYToolTipGenerator ttg = new StandardXYToolTipGenerator(
                 "{0}: {2}", new SimpleDateFormat("yyyy/MM/dd HH:mm"), NumberFormat.getInstance());
 
 
+        //Set the renderer
         StandardXYItemRenderer renderer = new StandardXYItemRenderer(
                 StandardXYItemRenderer.LINES, ttg, null);
 
+        //Create the plot
         XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
 
+        //Create the chart
         myChart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
 
+        //Attach the chart to the panel
         ((ChartPanel) chartPanel).setChart(myChart);
+        //Set max draw size to 2560x1440
+        ((ChartPanel) chartPanel).setMaximumDrawHeight(1440);
+        ((ChartPanel) chartPanel).setMaximumDrawWidth(2560);
     }
 
     /**
@@ -276,7 +326,7 @@ public class PowerPanel extends javax.swing.JPanel {
             Calendar cal = Calendar.getInstance();
             Date currentDate = new Date();
             cal.setTime(currentDate);
-            cal.add(Calendar.SECOND, -1000);
+            cal.add(Calendar.SECOND, -MAX_DATA_POINTS_LIVE);
             Date startDate = cal.getTime();
 
             ArrayList<Powerlog> logs = theHistorian.getPowerlogs(currentFocus, startDate, currentDate, MAX_DATA_POINTS_LIVE);
@@ -344,5 +394,4 @@ public class PowerPanel extends javax.swing.JPanel {
     private com.toedter.calendar.JDateChooser startDateChooser;
     private com.unicornlabs.kabouter.gui.components.JTimeSpinner startTimeSpinner;
     // End of variables declaration//GEN-END:variables
-
 }
