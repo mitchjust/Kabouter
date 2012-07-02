@@ -19,6 +19,7 @@ package com.unicornlabs.kabouter.historian;
 
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
+import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -170,7 +171,7 @@ public class Historian {
     public ArrayList<Powerlog> getPowerlogs(String deviceId) {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
-        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "'").list();
+        List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "' order by powerlog.id.logtime").list();
         session.getTransaction().commit();
         session.close();
 
@@ -189,13 +190,107 @@ public class Historian {
         Session session = SESSIONFACTORY.openSession();
         session.beginTransaction();
         List result = session.createQuery("from Powerlog as powerlog where powerlog.id.deviceid = '" + deviceId + "' "
-                + "and powerlog.id.logtime between '" + from + "' and '" + to + "'").list();
+                + "and powerlog.id.logtime between '" + from + "' and '" + to + "' order by powerlog.id.logtime").list();
         session.getTransaction().commit();
         session.close();
 
         return (ArrayList) result;
     }
 
+    /**
+     * Returns data sampled at regular intervals between two dates
+     * @param deviceId the device id
+     * @param from the first date
+     * @param to the last date
+     * @param maxNumRecords the maximum number of data points to return
+     * @return the logs
+     */
+    public ArrayList<Powerlog> getPowerlogs(String deviceId, Date from, Date to, int maxNumRecords) {
+        ArrayList<Powerlog> preparedData = new ArrayList<Powerlog>();        
+
+        ArrayList<Powerlog> rawData = getPowerlogs(deviceId, from, to);
+        
+        /**
+         * For no logs case, add a zero log at the start and finish
+         */
+        if(rawData.isEmpty()) {
+            Powerlog startLog = new Powerlog(new PowerlogId(from, deviceId), 0d);
+            Powerlog endLog = new Powerlog(new PowerlogId(to, deviceId), 0d);
+            
+            preparedData.add(startLog);
+            preparedData.add(endLog);
+            
+            return preparedData;
+        }
+        
+        /**
+         * Adjust is the number or records is less than the requested count
+         */
+        if(rawData.size() < maxNumRecords) {
+            maxNumRecords = rawData.size();
+        }
+        
+        //Get the sampling interval
+        long dateDifference = to.getTime() - from.getTime();
+        long dateInterval = dateDifference / maxNumRecords;
+        
+        //Set the first sample to the first date
+        long sampleDate = from.getTime();
+        
+        //Start from the first log
+        int logIndex = 0;
+
+        //For each data point requested
+        for (int i = 0; i < maxNumRecords; i++) {
+            //The first sample date is half of the interval before the sample date
+            long sampleFrom = sampleDate - dateInterval / 2;
+            Date sampleFromDate = new Date(sampleFrom);
+            //The last sample date is half of the interval after the sample date
+            long sampleTo = sampleDate + dateInterval / 2;
+            Date sampleToDate = new Date(sampleTo);
+            
+            double samplePower = getAveragePower(rawData, sampleFromDate, sampleToDate);
+            
+            Powerlog newLog = new Powerlog(new PowerlogId(new Date(sampleDate), deviceId), samplePower);
+            
+            preparedData.add(newLog);
+
+            //Increment sample date
+            sampleDate += dateInterval;
+        }
+        
+        return preparedData;
+    }
+    
+    /**
+     * Gets the average power between two dates in a list of power logs
+     * @param logs the list of logs
+     * @param from the start date
+     * @param to the end date
+     * @return the average power
+     */
+    public double getAveragePower(ArrayList<Powerlog> logs, Date from, Date to) {
+        double avgPower = 0;
+        int count = 0;
+        
+        //For each log
+        for(Powerlog log : logs) {
+            //If the date is or is after the start date
+            if(log.getId().getLogtime().compareTo(from) >= 0) {
+                //Break if we have gone past the end date
+                if(log.getId().getLogtime().compareTo(to) > 0) {
+                    break;
+                }
+                //Sum the power
+                avgPower += log.getPower();
+                count++;
+            }
+        }
+        
+        //Divide by count
+        return avgPower/count;
+    }
+    
     /**
      * Returns all power logs from all devices between a date range
      *
