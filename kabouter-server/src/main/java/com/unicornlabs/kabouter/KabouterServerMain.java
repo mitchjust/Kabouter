@@ -44,6 +44,7 @@ import javax.swing.SwingUtilities;
 public class KabouterServerMain {
 
     private static final Logger LOGGER = Logger.getLogger(KabouterServerMain.class.getName());
+    private static boolean NOGUI = false;
 
     static {
         LOGGER.setLevel(Level.ALL);
@@ -51,18 +52,34 @@ public class KabouterServerMain {
 
     /**
      * Main method for Server
+     *
      * @param args input arguments
      */
     public static void main(String[] args) {
 
+        for (String argument : args) {
+            if (argument.equalsIgnoreCase("-nogui")) {
+                NOGUI = true;
+            }
+            else {
+                System.out.println("Unknown Argument: " + argument);
+                System.exit(-1);
+            }
+        }
+
         //Display the splash screen
+
         setGUILookAndFeel();
         SplashScreen mySplashScreen = new SplashScreen();
         mySplashScreen.setTitle(KabouterConstants.FRAME_TITLE);
         //Put it in the middle of the screen and make it visible
         mySplashScreen.setLocationRelativeTo(null);
-        mySplashScreen.setVisible(true);
+
         mySplashScreen.addText("Starting Kabouter Server...\n");
+
+        if (NOGUI == false) {
+            mySplashScreen.setVisible(true);
+        }
 
         try {
 
@@ -102,20 +119,22 @@ public class KabouterServerMain {
             theDeviceManager.addDeviceEventListener(theAutomationManager);
             BusinessObjectManager.registerBusinessObject(AutomationManager.class.getName(), theAutomationManager);
             mySplashScreen.addText("Done!\n");
-            
+
             //Start the GUI Manager in the Swing Initializer Thread
-            mySplashScreen.addText("Starting GUI Manager...");
+            if (NOGUI == false) {
+                mySplashScreen.addText("Starting GUI Manager...");
 
-            SwingUtilities.invokeLater(new Runnable() {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    GuiManager theGuiManager = new GuiManager();
-                    BusinessObjectManager.registerBusinessObject(GuiManager.class.getName(), theGuiManager);
-                    theGuiManager.initalize();
-                }
-            });
-            mySplashScreen.addText("Done!\n");
+                    @Override
+                    public void run() {
+                        GuiManager theGuiManager = new GuiManager();
+                        BusinessObjectManager.registerBusinessObject(GuiManager.class.getName(), theGuiManager);
+                        theGuiManager.initalize();
+                    }
+                });
+                mySplashScreen.addText("Done!\n");
+            }
 
             //Finished loading all components
             mySplashScreen.dispose();
