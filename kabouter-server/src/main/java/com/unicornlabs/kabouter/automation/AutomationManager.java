@@ -57,7 +57,7 @@ public class AutomationManager {
         
         di.ioStates[ioNum] = value;
         
-        theDeviceManager.updateDevice(di);
+        theDeviceManager.updateDeviceIOState(di);
     }
     
 }
