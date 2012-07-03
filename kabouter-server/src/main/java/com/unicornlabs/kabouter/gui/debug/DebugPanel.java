@@ -185,17 +185,32 @@ public class DebugPanel extends javax.swing.JPanel {
             
             LOGGER.info("Generating Logs...");
             
-            for(int i=0;i<entries;i++) {
-                double d = 1000+r.nextDouble()*100;
-                PowerlogId id = new PowerlogId(theCalendar.getTime(), deviceId);
-                Powerlog log = new Powerlog(id, d);
-                powerlogs.add(log);
-                theCalendar.add(Calendar.SECOND, -1);
+            int count = 0;
+            int currentSectionLength = r.nextInt(100);
+            float setPoint = r.nextFloat() * (float)r.nextInt(1000);
+            
+            for(int pass =0; pass<entries; pass++) {
+                powerlogs.clear();
+                for(int i=0;i<1000;i++) {
+
+                    if(count >= currentSectionLength) {
+                        currentSectionLength = r.nextInt(60*60*4);
+                        count = 0;
+                        setPoint = r.nextFloat() * (float)r.nextInt(1000);
+                    }
+
+                    double d = setPoint+r.nextDouble()*100;
+                    PowerlogId id = new PowerlogId(theCalendar.getTime(), deviceId);
+                    Powerlog log = new Powerlog(id, d);
+                    powerlogs.add(log);
+                    theCalendar.add(Calendar.MINUTE, -1);
+                }
+                LOGGER.log(Level.INFO, "Sending Logs To Historian '{'Pass {0}'}'", pass);
+            
+                theHistorian.savePowerlogs(powerlogs);
             }
             
-            LOGGER.info("Sending Logs To Historian");
             
-            theHistorian.savePowerlogs(powerlogs);
             
             JOptionPane.showMessageDialog(this, "Added " + entries + " new entries","Complete",JOptionPane.INFORMATION_MESSAGE);
             

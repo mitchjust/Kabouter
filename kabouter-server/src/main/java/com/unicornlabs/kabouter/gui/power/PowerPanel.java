@@ -366,7 +366,7 @@ public class PowerPanel extends javax.swing.JPanel {
             Date end = cal.getTime();
 
             ArrayList<Powerlog> logs = theHistorian.getPowerlogs(currentFocus, start, end, MAX_DATA_POINTS);
-
+            
             setupChart(logs, currentFocus);
         }
 
