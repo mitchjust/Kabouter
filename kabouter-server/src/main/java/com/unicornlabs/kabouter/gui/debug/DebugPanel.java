@@ -23,7 +23,6 @@ import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,11 +172,7 @@ public class DebugPanel extends javax.swing.JPanel {
             
             Calendar theCalendar = Calendar.getInstance();
             
-            Device newDevice = new Device(deviceId, "1.1.1.1");
-            newDevice.setNumio(0);
-            
-            
-            //theDeviceManager.insertNewDevice(newDevice);
+            theDeviceManager.insertNewDevice(deviceId, "KABOUTER_TEST_DEVICE", deviceId);
             
             Random r = new Random(); 
             ArrayList<Powerlog> powerlogs = new ArrayList<Powerlog>();
@@ -203,6 +198,7 @@ public class DebugPanel extends javax.swing.JPanel {
                     Powerlog log = new Powerlog(id, d);
                     powerlogs.add(log);
                     theCalendar.add(Calendar.MINUTE, -1);
+                    count++;
                 }
                 LOGGER.log(Level.INFO, "Sending Logs To Historian '{'Pass {0}'}'", pass);
             

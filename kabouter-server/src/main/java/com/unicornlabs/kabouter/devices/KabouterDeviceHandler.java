@@ -17,9 +17,9 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.devices;
 
-import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
+import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
@@ -27,7 +27,10 @@ import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
  * KabouterDeviceHandler.java
