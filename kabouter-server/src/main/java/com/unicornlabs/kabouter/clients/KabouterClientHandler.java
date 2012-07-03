@@ -18,7 +18,7 @@
 package com.unicornlabs.kabouter.clients;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
-import com.unicornlabs.kabouter.devices.DeviceInfo;
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,7 +87,7 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
         ClientServerMessage message = (ClientServerMessage) e.getMessage();
 
         if (message.messageType.contentEquals(ClientServerMessage.DEVICE_INFO_REQUEST)) {
-            DeviceInfo di = theDeviceManager.getDeviceInfo(message.deviceId);
+            DeviceStatus di = theDeviceManager.getDeviceInfo(message.deviceId);
 
             if (di == null) {
                 LOGGER.log(Level.SEVERE, "Device Requested unknown device id: {0}", message.deviceId);

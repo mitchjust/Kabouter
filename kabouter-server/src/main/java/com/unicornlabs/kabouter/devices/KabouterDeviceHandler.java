@@ -66,7 +66,7 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        DeviceInfo deviceInfo = (DeviceInfo) ctx.getAttachment();
+        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
         Device device = deviceInfo.theDevice;
         LOGGER.log(Level.SEVERE, "Exception Caught for Device {0}:\n{1}", new Object[]{device.getId(), e.getCause().getMessage()});
         deviceInfo.isConnected = false;
@@ -87,17 +87,29 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         DeviceServerMessage message = (DeviceServerMessage) e.getMessage();
-        
-        Device theDevice = message.device;
-        
-        LOGGER.log(Level.INFO, "Handling Device Message From {0}", theDevice.getId());
-        
-        DeviceInfo deviceInfo = theDeviceManager.getDeviceInfo(theDevice.getId());
+        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
         
         if(deviceInfo == null) {
             //First connection from a new device
+            
+            if(!message.messageType.contentEquals(DeviceServerMessage.DEVICE_CONFIG)) {
+                LOGGER.severe("Device did not send Configuration Message");
+                return;
+            }
+            
             LOGGER.log(Level.INFO, "Unknown Device, Creating new configuration");
-            deviceInfo = theDeviceManager.insertNewDevice(theDevice);
+            
+            String[] split = message.data.split(":");
+            
+            if(split.length != 2) {
+                LOGGER.log(Level.SEVERE, "Invalid Configuration String: {0}", message.data);
+                ctx.getChannel().close();
+                return;
+            }
+            
+            deviceInfo = theDeviceManager.getDeviceInfo(split[0]);
+            
+            deviceInfo = theDeviceManager.insertNewDevice(split[0],split[1]);
         }
         
         if(deviceInfo.isConnected == false) {
@@ -121,15 +133,15 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
             theDeviceManager.fireDeviceEvent(deviceIOEvent);
         }
         else if(message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
-            Double power = JSONUtils.FromJSON(message.data, Double.class);
-            
-            Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), theDevice.getId()), (double)power);
-            
-            theHistorian.savePowerlog(newPowerlog);
-            
-            DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
-            
-            theDeviceManager.fireDeviceEvent(devicePowerEvent);
+//            Double power = JSONUtils.FromJSON(message.data, Double.class);
+//            
+//            Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), theDevice.getId()), (double)power);
+//            
+//            theHistorian.savePowerlog(newPowerlog);
+//            
+//            DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
+//            
+//            theDeviceManager.fireDeviceEvent(devicePowerEvent);
         }
     }
     

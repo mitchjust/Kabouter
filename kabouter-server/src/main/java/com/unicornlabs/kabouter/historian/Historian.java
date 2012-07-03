@@ -18,6 +18,7 @@
 package com.unicornlabs.kabouter.historian;
 
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import com.unicornlabs.kabouter.historian.data_objects.Devicetemplate;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.ArrayList;
@@ -424,5 +425,22 @@ public class Historian {
         session.close();
 
         return (ArrayList) result;
+    }
+
+    public Devicetemplate getDevicetemplate(String deviceType) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Devicetemplate as devicetemplate where devicetemplate.templatename ='" + deviceType + "'").list();
+        session.getTransaction().commit();
+        session.close();
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        if (result.size() != 1) {
+            throw new org.hibernate.NonUniqueResultException(result.size());
+        }
+
+        return (Devicetemplate) result.get(0);
     }
 }

@@ -43,7 +43,6 @@ public class DeviceServerMessage {
     }
     
     public String messageType;
-    public Device device;
     public String data;
 
 }

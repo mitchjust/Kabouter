@@ -3,25 +3,16 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 03/07/2012 7:11:29 PM by Hibernate Tools 3.2.1.GA -->
 <hibernate-mapping>
-    <class name="com.unicornlabs.kabouter.historian.data_objects.Device" table="device" schema="kabouterserver">
-        <id name="id" type="string">
-            <column name="id" />
+    <class name="com.unicornlabs.kabouter.historian.data_objects.Devicetemplate" table="devicetemplate" schema="kabouterserver">
+        <id name="templatename" type="string">
+            <column name="templatename" />
             <generator class="assigned" />
         </id>
-        <property name="ipaddress" type="string">
-            <column name="ipaddress" not-null="true" />
-        </property>
-        <property name="type" type="string">
-            <column name="type" />
-        </property>
-        <property name="numio" type="java.lang.Integer">
-            <column name="numio" />
-        </property>
+        <property name="numio" type="int">
+            <column name="numio" not-null="true" />
+        </property>     
         <property name="ionames" type="com.unicornlabs.kabouter.historian.ListAsSQLArrayUserType$STRING">
             <column name="ionames" sql-type="text[]" />
-        </property>
-        <property name="displayname" type="string">
-            <column name="displayname" />
         </property>
         <property name="iotypes" type="com.unicornlabs.kabouter.historian.ListAsSQLArrayUserType$STRING">
             <column name="iotypes" sql-type="text[]" />

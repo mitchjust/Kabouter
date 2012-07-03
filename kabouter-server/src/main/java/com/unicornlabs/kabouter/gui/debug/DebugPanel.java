@@ -174,11 +174,10 @@ public class DebugPanel extends javax.swing.JPanel {
             Calendar theCalendar = Calendar.getInstance();
             
             Device newDevice = new Device(deviceId, "1.1.1.1");
-            newDevice.setHaspowerlogging(Boolean.TRUE);
             newDevice.setNumio(0);
             
             
-            theDeviceManager.insertNewDevice(newDevice);
+            //theDeviceManager.insertNewDevice(newDevice);
             
             Random r = new Random(); 
             ArrayList<Powerlog> powerlogs = new ArrayList<Powerlog>();

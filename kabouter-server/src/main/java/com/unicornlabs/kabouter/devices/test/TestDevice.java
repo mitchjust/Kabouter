@@ -103,12 +103,13 @@ public class TestDevice {
                 newDevice.setId(devid);
                 
                 DeviceServerMessage newMessage = new DeviceServerMessage();
-                newMessage.device = newDevice;
                 newMessage.messageType = DeviceServerMessage.DEVICE_CONFIG;
                 
                 String jsonString = JSONUtils.ToJSON(newMessage);
                 
                 System.out.println("Sending Config Message");
+                
+                System.out.println("jsonString = " + jsonString);
                 
                 mySocket.getOutputStream().write(jsonString.getBytes());
                 
@@ -124,7 +125,6 @@ public class TestDevice {
                 
                 DeviceServerMessage newMessage = new DeviceServerMessage();
                 newMessage.data = JSONUtils.ToJSON(newIo);
-                newMessage.device = newDevice;
                 newMessage.messageType = DeviceServerMessage.IO_STATE_CHANGE;
                 
                 String jsonString = JSONUtils.ToJSON(newMessage);
@@ -188,12 +188,12 @@ public class TestDevice {
                     float value = r.nextFloat() * (baseLevel / 10) + baseLevel;
                     DeviceServerMessage newMessage = new DeviceServerMessage();
                     newMessage.data = JSONUtils.ToJSON(value);
-                    newMessage.device = newDevice;
                     newMessage.messageType = DeviceServerMessage.POWER_LOG;
                     
                     String jsonString = JSONUtils.ToJSON(newMessage);
                     
                     System.out.println("Sending Power Message: " + value);
+                    System.out.println("jsonString = " + jsonString);
                     
                     mySocket.getOutputStream().write(jsonString.getBytes());
                     
