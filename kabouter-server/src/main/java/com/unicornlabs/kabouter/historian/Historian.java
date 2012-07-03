@@ -271,6 +271,27 @@ public class Historian {
 
         return preparedData;
     }
+    
+    /**
+     * Returns data sampled at regular intervals between two dates
+     *
+     * @param deviceId the device id
+     * @param from the first date
+     * @param to the last date
+     * @param maxNumRecords the maximum number of data points to return
+     * @return the logs
+     */
+    public ArrayList<Powerlog> getPowerlogs(List deviceIds, Date from, Date to, int maxNumRecords) {
+        ArrayList<Powerlog> preparedData = new ArrayList<Powerlog>();
+        
+        for(Object item : deviceIds) {
+            String deviceId = (String)item;
+            ArrayList<Powerlog> powerlogs = getPowerlogs(deviceId, from, to, maxNumRecords);
+            preparedData.addAll(powerlogs);
+        }
+        
+        return preparedData;
+    }
 
     /**
      * Gets the average power between two dates in a list of power logs
