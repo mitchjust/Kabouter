@@ -17,8 +17,8 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.devices.test;
 
-import com.unicornlabs.kabouter.devices.DeviceServerMessage;
-import com.unicornlabs.kabouter.devices.ServerDeviceMessage;
+import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
+import com.unicornlabs.kabouter.devices.messaging.ServerDeviceMessage;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.util.JSONUtils;
 import java.io.*;
@@ -88,22 +88,10 @@ public class TestDevice {
                 socketin = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
                 socketout = new PrintWriter(new OutputStreamWriter(mySocket.getOutputStream()));
                 
-                newDevice = new Device();
-                
-                newDevice.setDisplayname("Test Device");
-                newDevice.setHaspowerlogging(Boolean.TRUE);
-                newDevice.setIonames(Arrays.asList(new String[]{"Test IO 1", "Test IO 2"}));
-                newDevice.setIpaddress("127.0.0.1");
-                newDevice.setNumio(2);
-                newDevice.setType("TEST_DEV");
-                
-                System.out.print("Device ID: ");
-                String devid = br.readLine();
-                
-                newDevice.setId(devid);
-                
                 DeviceServerMessage newMessage = new DeviceServerMessage();
+                
                 newMessage.messageType = DeviceServerMessage.DEVICE_CONFIG;
+                newMessage.data = "TEST_DEVICE:KABOUTER_TEST_DEVICE";
                 
                 String jsonString = JSONUtils.ToJSON(newMessage);
                 
@@ -187,7 +175,7 @@ public class TestDevice {
                 try {
                     float value = r.nextFloat() * (baseLevel / 10) + baseLevel;
                     DeviceServerMessage newMessage = new DeviceServerMessage();
-                    newMessage.data = JSONUtils.ToJSON(value);
+                    newMessage.data = value;
                     newMessage.messageType = DeviceServerMessage.POWER_LOG;
                     
                     String jsonString = JSONUtils.ToJSON(newMessage);

@@ -64,7 +64,6 @@ public class HistorianTest extends TestCase {
         Device newDevice = new Device();
         newDevice.setId(testId);
         newDevice.setDisplayname(testDisplayName);
-        newDevice.setHaspowerlogging(testPower);
         newDevice.setIpaddress(testIp);
         newDevice.setNumio(testNumIo);
         newDevice.setIonames(testIoNames);
@@ -81,7 +80,6 @@ public class HistorianTest extends TestCase {
         
         assertEquals(test2.getId(), testId);
         assertEquals(test2.getDisplayname(), testDisplayName);
-        assertEquals(test2.getHaspowerlogging(), testPower);
         assertEquals(test2.getIpaddress(), testIp);
         assertEquals((int)test2.getNumio(), (int)testNumIo);
         assertEquals(test2.getIonames().size(), testIoNames.size());
@@ -105,7 +103,6 @@ public class HistorianTest extends TestCase {
         
         assertEquals(test3.getId(), testId);
         assertEquals(test3.getDisplayname(), testUpdatedDisplayName);
-        assertEquals(test3.getHaspowerlogging(), testPower);
         assertEquals(test3.getIpaddress(), testIp);
         assertEquals((int)test3.getNumio(), (int)testNumIo);
         assertEquals(test3.getIonames().size(), testIoNames.size());

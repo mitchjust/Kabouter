@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.devices;
 
+import com.unicornlabs.kabouter.devices.messaging.ServerDeviceMessage;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
@@ -75,7 +76,7 @@ public class DeviceManager {
         this.myPort = Integer.parseInt(theConfigManager.getProperty(DeviceManager.class.getName(), "TCP_LISTENING_PORT"));
         myDeviceStatuses = new HashMap<String, DeviceStatus>();
         myDeviceEventListeners = new ArrayList<DeviceEventListener>();
-        generateDeviceInfos();
+        generateDeviceStatusMap();
     }
     
     /**
@@ -89,7 +90,7 @@ public class DeviceManager {
     /**
      * Get the saved devices from the historian and generate DeviceInfo objects
      */
-    private void generateDeviceInfos() {
+    private void generateDeviceStatusMap() {
         ArrayList<Device> devices = theHistorian.getDevices();
 
         for (Device d : devices) {
@@ -104,7 +105,7 @@ public class DeviceManager {
      *
      * @return the list
      */
-    public DeviceStatus[] getDeviceInfos() {
+    public DeviceStatus[] getDeviceStatuses() {
         Set<String> keySet = myDeviceStatuses.keySet();
         DeviceStatus[] deviceInfoList = new DeviceStatus[keySet.size()];
 
@@ -125,7 +126,7 @@ public class DeviceManager {
      * @param deviceId the device id
      * @return the device info
      */
-    public DeviceStatus getDeviceInfo(String deviceId) {
+    public DeviceStatus getDeviceStatus(String deviceId) {
         DeviceStatus get = myDeviceStatuses.get(deviceId);
         return get;
     }
@@ -154,10 +155,11 @@ public class DeviceManager {
      * @param newDevice the device details
      * @return the deviceinfo object
      */
-    public DeviceStatus insertNewDevice(String deviceId, String deviceType) {
+    public DeviceStatus insertNewDevice(String deviceId, String deviceType, String ipAddress) {
         Device newDevice = getTemplatedDevice(deviceType);
         newDevice.setId(deviceId);
         newDevice.setDisplayname(deviceId);
+        newDevice.setIpaddress(ipAddress);
         
         DeviceStatus newDeviceStatus = new DeviceStatus(newDevice);
         
@@ -202,15 +204,19 @@ public class DeviceManager {
         di.tcpChannel.write(newMessage);
     }
 
-    public ArrayList<String> getDeviceIds() {
-        ArrayList<String> deviceIds = new ArrayList<String>();
-        DeviceStatus[] deviceInfos = getDeviceInfos();
+    /**
+     * Returns a list of the device display names
+     * @return the list
+     */
+    public ArrayList<String> getDeviceDisplayNames() {
+        ArrayList<String> deviceDisplayNames = new ArrayList<String>();
+        DeviceStatus[] deviceInfos = getDeviceStatuses();
         
         for(DeviceStatus di : deviceInfos) {
-            deviceIds.add(di.theDevice.getId());
+            deviceDisplayNames.add(di.theDevice.getDisplayname());
         }
         
-        return deviceIds;
+        return deviceDisplayNames;
     }
 
 }

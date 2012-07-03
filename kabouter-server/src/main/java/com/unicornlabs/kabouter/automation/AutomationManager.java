@@ -50,7 +50,7 @@ public class AutomationManager implements DeviceEventListener{
     }
     
     public void forceIOState(String deviceId, int ioNum, int value) {
-        DeviceStatus di = theDeviceManager.getDeviceInfo(deviceId);
+        DeviceStatus di = theDeviceManager.getDeviceStatus(deviceId);
         
         if(di == null) {
             LOGGER.log(Level.SEVERE, "Invalid Device ID specified in IO Override: {0}", deviceId);

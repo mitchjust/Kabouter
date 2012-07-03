@@ -60,7 +60,7 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
      */
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        ctx.getChannel().write(theDeviceManager.getDeviceInfos());
+        ctx.getChannel().write(theDeviceManager.getDeviceStatuses());
     }
 
     @Override
@@ -87,13 +87,13 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
         ClientServerMessage message = (ClientServerMessage) e.getMessage();
 
         if (message.messageType.contentEquals(ClientServerMessage.DEVICE_INFO_REQUEST)) {
-            DeviceStatus di = theDeviceManager.getDeviceInfo(message.deviceId);
+            DeviceStatus di = theDeviceManager.getDeviceStatus(message.deviceId);
 
             if (di == null) {
                 LOGGER.log(Level.SEVERE, "Device Requested unknown device id: {0}", message.deviceId);
                 ctx.getChannel().write("Unknown Device ID!");
             } else {
-                ctx.getChannel().write(theDeviceManager.getDeviceInfo(message.deviceId));
+                ctx.getChannel().write(theDeviceManager.getDeviceStatus(message.deviceId));
             }
         } else if (message.messageType.contentEquals(ClientServerMessage.DEVICE_CONTROL_REQUEST)) {
             //TODO Handle io change

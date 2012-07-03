@@ -79,7 +79,7 @@ public class PowerPanel extends javax.swing.JPanel {
         deviceList.removeAll();
 
         //Get the device ids from the device manager
-        ArrayList<String> deviceIds = theDeviceManager.getDeviceIds();
+        ArrayList<String> deviceIds = theDeviceManager.getDeviceDisplayNames();
 
         //Sort them alphabetically
         Collections.sort(deviceIds);

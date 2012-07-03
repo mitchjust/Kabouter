@@ -68,8 +68,6 @@ public class JSONDecoder<T> extends OneToOneDecoder {
 
         T message = JSONUtils.FromJSON(jsonString, messageClass);
         
-        System.out.println("message = " + message);
-        
         return message;
     }
 }

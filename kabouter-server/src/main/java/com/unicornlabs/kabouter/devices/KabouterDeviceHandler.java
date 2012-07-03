@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.devices;
 
+import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
-import com.unicornlabs.kabouter.util.JSONUtils;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,36 +31,24 @@ import org.jboss.netty.channel.*;
 
 /**
  * KabouterDeviceHandler.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * Handler for Kabouter-enabled end devices
+ * Description: Handler for Kabouter-enabled end devices
  */
-
-public class KabouterDeviceHandler extends SimpleChannelHandler{
+public class KabouterDeviceHandler extends SimpleChannelHandler {
 
     private static final Logger LOGGER = Logger.getLogger(KabouterDeviceHandler.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     private DeviceManager theDeviceManager;
     private Historian theHistorian;
-    
+
     public KabouterDeviceHandler() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
-    }
-
-    @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelConnected(ctx, e);
-    }
-
-    @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelDisconnected(ctx, e);
     }
 
     @Override
@@ -75,76 +62,55 @@ public class KabouterDeviceHandler extends SimpleChannelHandler{
     }
 
     @Override
-    public void handleDownstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
-        super.handleDownstream(ctx, e);
-    }
-
-    @Override
-    public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
-        super.handleUpstream(ctx, e);
-    }
-
-    @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         DeviceServerMessage message = (DeviceServerMessage) e.getMessage();
-        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
-        
-        if(deviceInfo == null) {
+        DeviceStatus deviceStatus = (DeviceStatus) ctx.getAttachment();
+
+        if (deviceStatus == null) {
             //First connection from a new device
-            
-            if(!message.messageType.contentEquals(DeviceServerMessage.DEVICE_CONFIG)) {
+            LOGGER.log(Level.INFO, "First Communications With A New Device");
+
+            if (!message.messageType.contentEquals(DeviceServerMessage.DEVICE_CONFIG)) {
                 LOGGER.severe("Device did not send Configuration Message");
                 return;
             }
-            
-            LOGGER.log(Level.INFO, "Unknown Device, Creating new configuration");
-            
-            String[] split = message.data.split(":");
-            
-            if(split.length != 2) {
+
+            String[] split = ((String) message.data).split(":");
+
+            if (split.length != 2) {
                 LOGGER.log(Level.SEVERE, "Invalid Configuration String: {0}", message.data);
                 ctx.getChannel().close();
                 return;
             }
+
+            deviceStatus = theDeviceManager.getDeviceStatus(split[0]);
+
+            if (deviceStatus == null) {
+                //Device has never connected before
+                deviceStatus = theDeviceManager.insertNewDevice(split[0], split[1], ctx.getChannel().getRemoteAddress().toString());
+            }
+
+            //Set device as ready and attach comms channel
+            deviceStatus.isConnected = true;
+            deviceStatus.tcpChannel = ctx.getChannel();
             
-            deviceInfo = theDeviceManager.getDeviceInfo(split[0]);
-            
-            deviceInfo = theDeviceManager.insertNewDevice(split[0],split[1]);
-        }
-        
-        if(deviceInfo.isConnected == false) {
-            //Set connected state to true
-            deviceInfo.isConnected = true;
-            //Attach the channel
-            deviceInfo.tcpChannel = ctx.getChannel();
-            
-            //Attach the device to the channel context
-            ctx.setAttachment(deviceInfo);
-        }
-        
-        //handle message stuff
-        
-        if(message.messageType.contentEquals(DeviceServerMessage.IO_STATE_CHANGE)) {
-            Integer[] newIOStates = JSONUtils.FromJSON(message.data, Integer[].class);
-            deviceInfo.ioStates = newIOStates;
-            
-            DeviceEvent deviceIOEvent = new DeviceEvent(theDeviceManager, DeviceEvent.IO_CHANGE_EVENT, deviceInfo);
-            
-            theDeviceManager.fireDeviceEvent(deviceIOEvent);
-        }
-        else if(message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
-//            Double power = JSONUtils.FromJSON(message.data, Double.class);
-//            
-//            Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), theDevice.getId()), (double)power);
-//            
-//            theHistorian.savePowerlog(newPowerlog);
-//            
-//            DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
-//            
-//            theDeviceManager.fireDeviceEvent(devicePowerEvent);
+            //Attach devicestatus to the channel context
+            ctx.setAttachment(deviceStatus);
+
+            LOGGER.log(Level.INFO, "Successfully configured Device: {0}", deviceStatus.theDevice.getId());
+        } else {
+            //Device is already connected, handle possible messages
+
+            if (message.messageType.contentEquals(DeviceServerMessage.IO_STATE_CHANGE)) {
+            } else if (message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
+                Double value = (Double) message.data;
+                Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), deviceStatus.theDevice.getId()), value);
+                theHistorian.savePowerlog(newPowerlog);
+                DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
+                theDeviceManager.fireDeviceEvent(devicePowerEvent);
+
+            }
+
         }
     }
-    
-    
-
 }
