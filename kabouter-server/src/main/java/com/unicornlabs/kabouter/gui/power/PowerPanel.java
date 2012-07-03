@@ -57,7 +57,6 @@ public class PowerPanel extends javax.swing.JPanel {
     static {
         LOGGER.setLevel(Level.ALL);
     }
-    public static final String TOTAL_POWER = "Total";
 
     /**
      * Creates new form PowerPanel
@@ -84,9 +83,6 @@ public class PowerPanel extends javax.swing.JPanel {
 
         //Sort them alphabetically
         Collections.sort(deviceIds);
-        
-        //Add the total power item at the top
-        deviceIds.add(0, TOTAL_POWER);
         
         String[] deviceIdsAsStringArr = new String[deviceIds.size()];
         deviceIdsAsStringArr = deviceIds.toArray(deviceIdsAsStringArr);
@@ -180,7 +176,7 @@ public class PowerPanel extends javax.swing.JPanel {
 
         //Set the renderer
         StandardXYItemRenderer renderer = new StandardXYItemRenderer(
-                StandardXYItemRenderer.SHAPES_AND_LINES, ttg, null);
+                StandardXYItemRenderer.LINES, ttg, null);
 
         //Create the plot
         XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
