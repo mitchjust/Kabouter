@@ -16,7 +16,7 @@
  */
 // </editor-fold>
 
-package com.unicornlabs.kabouter.devices;
+package com.unicornlabs.kabouter.devices.messaging;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

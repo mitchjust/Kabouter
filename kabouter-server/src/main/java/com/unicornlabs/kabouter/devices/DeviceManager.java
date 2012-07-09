@@ -17,12 +17,14 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.devices;
 
+import com.unicornlabs.kabouter.devices.messaging.ServerDeviceMessage;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.config.ConfigManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import com.unicornlabs.kabouter.historian.data_objects.Devicetemplate;
 import com.unicornlabs.kabouter.net.TCPChannelServer;
 import com.unicornlabs.kabouter.util.JSONUtils;
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class DeviceManager {
     /**
      * Map of devices to device ids
      */
-    private HashMap<String, DeviceInfo> myDeviceInfos;
+    private HashMap<String, DeviceStatus> myDeviceStatuses;
     /**
      * List of event listeners
      */
@@ -72,9 +74,9 @@ public class DeviceManager {
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         theConfigManager = (ConfigManager) BusinessObjectManager.getBusinessObject(ConfigManager.class.getName());
         this.myPort = Integer.parseInt(theConfigManager.getProperty(DeviceManager.class.getName(), "TCP_LISTENING_PORT"));
-        myDeviceInfos = new HashMap<String, DeviceInfo>();
+        myDeviceStatuses = new HashMap<String, DeviceStatus>();
         myDeviceEventListeners = new ArrayList<DeviceEventListener>();
-        generateDeviceInfos();
+        generateDeviceStatusMap();
     }
     
     /**
@@ -88,13 +90,13 @@ public class DeviceManager {
     /**
      * Get the saved devices from the historian and generate DeviceInfo objects
      */
-    private void generateDeviceInfos() {
+    private void generateDeviceStatusMap() {
         ArrayList<Device> devices = theHistorian.getDevices();
 
         for (Device d : devices) {
             LOGGER.log(Level.INFO, "Loading Config For Device: {0}", d.getId());
-            DeviceInfo di = new DeviceInfo(d);
-            myDeviceInfos.put(d.getId(), di);
+            DeviceStatus di = new DeviceStatus(d);
+            myDeviceStatuses.put(d.getId(), di);
         }
     }
 
@@ -103,16 +105,16 @@ public class DeviceManager {
      *
      * @return the list
      */
-    public DeviceInfo[] getDeviceInfos() {
-        Set<String> keySet = myDeviceInfos.keySet();
-        DeviceInfo[] deviceInfoList = new DeviceInfo[keySet.size()];
+    public DeviceStatus[] getDeviceStatuses() {
+        Set<String> keySet = myDeviceStatuses.keySet();
+        DeviceStatus[] deviceInfoList = new DeviceStatus[keySet.size()];
 
         Iterator<String> iterator = keySet.iterator();
         int i = 0;
 
         while (iterator.hasNext()) {
             String key = iterator.next();
-            deviceInfoList[i++] = myDeviceInfos.get(key);
+            deviceInfoList[i++] = myDeviceStatuses.get(key);
         }
 
         return deviceInfoList;
@@ -124,8 +126,8 @@ public class DeviceManager {
      * @param deviceId the device id
      * @return the device info
      */
-    public DeviceInfo getDeviceInfo(String deviceId) {
-        DeviceInfo get = myDeviceInfos.get(deviceId);
+    public DeviceStatus getDeviceStatus(String deviceId) {
+        DeviceStatus get = myDeviceStatuses.get(deviceId);
         return get;
     }
 
@@ -153,36 +155,68 @@ public class DeviceManager {
      * @param newDevice the device details
      * @return the deviceinfo object
      */
-    public DeviceInfo insertNewDevice(Device newDevice) {
-        DeviceInfo newDeviceInfo = new DeviceInfo(newDevice);
+    public DeviceStatus insertNewDevice(String deviceId, String deviceType, String ipAddress) {
+        Device newDevice = getTemplatedDevice(deviceType);
+        newDevice.setId(deviceId);
+        newDevice.setDisplayname(deviceId);
+        newDevice.setIpaddress(ipAddress);
         
-        LOGGER.log(Level.INFO, "Added new DeviceInfo: \n{0}", newDeviceInfo);
+        DeviceStatus newDeviceStatus = new DeviceStatus(newDevice);
         
-        myDeviceInfos.put(newDevice.getId(), newDeviceInfo);
+        LOGGER.log(Level.INFO, "Added new DeviceInfo: \n{0}", newDeviceStatus);
+        
+        myDeviceStatuses.put(newDevice.getId(), newDeviceStatus);
         theHistorian.saveDevice(newDevice);
         
-        DeviceEvent e = new DeviceEvent(this, DeviceEvent.NEW_DEVICE_EVENT, newDeviceInfo);
+        DeviceEvent e = new DeviceEvent(this, DeviceEvent.NEW_DEVICE_EVENT, newDeviceStatus);
         fireDeviceEvent(e);
         
-        return newDeviceInfo;
+        return newDeviceStatus;
+        
+    }
+    
+    /**
+     * Constructs a new device from a templated device
+     * @param deviceType the template name
+     * @return the new device
+     */
+    public Device getTemplatedDevice(String deviceType) {
+        Device newDevice = new Device();
+        Devicetemplate theDevicetemplate = theHistorian.getDevicetemplate(deviceType);
+        
+        if(theDevicetemplate == null) {
+            LOGGER.log(Level.SEVERE, "Unknown Device Type: {0}", deviceType);
+        }
+        
+        newDevice.setIodirections(theDevicetemplate.getIodirections());
+        newDevice.setIonames(theDevicetemplate.getIonames());
+        newDevice.setIotypes(theDevicetemplate.getIotypes());
+        newDevice.setNumio(theDevicetemplate.getNumio());
+        newDevice.setType(deviceType);
+        
+        return newDevice;
     }
 
-    public void updateDeviceIOState(DeviceInfo di) {
+    public void updateDeviceIOState(DeviceStatus di) {
         ServerDeviceMessage newMessage = new ServerDeviceMessage();
         newMessage.messageType = ServerDeviceMessage.IO_STATE_CHANGE;
         newMessage.data = JSONUtils.ToJSON(di.ioStates);
         di.tcpChannel.write(newMessage);
     }
 
-    public ArrayList<String> getDeviceIds() {
-        ArrayList<String> deviceIds = new ArrayList<String>();
-        DeviceInfo[] deviceInfos = getDeviceInfos();
+    /**
+     * Returns a list of the device display names
+     * @return the list
+     */
+    public ArrayList<String> getDeviceDisplayNames() {
+        ArrayList<String> deviceDisplayNames = new ArrayList<String>();
+        DeviceStatus[] deviceInfos = getDeviceStatuses();
         
-        for(DeviceInfo di : deviceInfos) {
-            deviceIds.add(di.theDevice.getId());
+        for(DeviceStatus di : deviceInfos) {
+            deviceDisplayNames.add(di.theDevice.getDisplayname());
         }
         
-        return deviceIds;
+        return deviceDisplayNames;
     }
 
 }

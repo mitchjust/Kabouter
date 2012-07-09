@@ -19,7 +19,7 @@
 package com.unicornlabs.kabouter.clients.test;
 
 import com.unicornlabs.kabouter.clients.ClientServerMessage;
-import com.unicornlabs.kabouter.devices.DeviceInfo;
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.util.JSONUtils;
 import java.io.*;
 import java.net.InetAddress;
@@ -91,11 +91,11 @@ public class TestClient {
                 String deviceListJson = socketin.readLine();
                 
                 System.out.println("deviceListJson = " + deviceListJson);
-                DeviceInfo[] FromJSON = JSONUtils.FromJSON(deviceListJson, DeviceInfo[].class);
+                DeviceStatus[] FromJSON = JSONUtils.FromJSON(deviceListJson, DeviceStatus[].class);
                 
                 System.out.println("FromJSON.length = " + FromJSON.length);
                 
-                for(DeviceInfo d : FromJSON) {
+                for(DeviceStatus d : FromJSON) {
                     System.out.println("Device:\n" + d);
                 }
             } catch (Exception ex) {
@@ -122,7 +122,7 @@ public class TestClient {
                 String deviceInfo = socketin.readLine();
                     
                 System.out.println("deviceInfo = " + deviceInfo);
-                DeviceInfo FromJSON = JSONUtils.FromJSON(deviceInfo, DeviceInfo.class);
+                DeviceStatus FromJSON = JSONUtils.FromJSON(deviceInfo, DeviceStatus.class);
                     
                 System.out.println("FromJSON = " + FromJSON);
             } catch (IOException ex) {

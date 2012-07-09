@@ -25,15 +25,15 @@ import java.util.logging.Logger;
 import org.jboss.netty.channel.Channel;
 
 /**
- * DeviceInfo.java
+ * DeviceStatus.java
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
  * Description: Device Manager representation of Device Objects
  */
-public class DeviceInfo implements Serializable {
+public class DeviceStatus implements Serializable {
 
-    private static final Logger LOGGER = Logger.getLogger(DeviceInfo.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DeviceStatus.class.getName());
 
     static {
         LOGGER.setLevel(Level.ALL);
@@ -44,7 +44,7 @@ public class DeviceInfo implements Serializable {
      *
      * @param theDevice
      */
-    public DeviceInfo(Device theDevice) {
+    public DeviceStatus(Device theDevice) {
         //Create array
         ioStates = new Integer[theDevice.getNumio()];
         //Set connected state to false initially
@@ -85,7 +85,6 @@ public class DeviceInfo implements Serializable {
         sb.append(theDevice.getIpaddress()).append("\n");
         sb.append(theDevice.getType()).append("\n");
         sb.append("Connected: ").append(isConnected).append("\n");
-        sb.append("Power Logging: ").append(theDevice.getHaspowerlogging()).append("\n");
 
         for (int i = 0; i < theDevice.getNumio(); i++) {
             sb.append("IO#").append(i).append(" {").append(theDevice.getIonames().get(i)).append("}: ").append(ioStates[i]).append("\n");

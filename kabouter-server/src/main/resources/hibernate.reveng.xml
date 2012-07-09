@@ -4,4 +4,5 @@
   <schema-selection match-catalog="kabouter" match-schema="kabouterserver"/>
   <table-filter match-name="powerlog"/>
   <table-filter match-name="device"/>
+  <table-filter match-name="devicetemplate"/>
 </hibernate-reverse-engineering>

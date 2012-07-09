@@ -18,7 +18,7 @@
 package com.unicornlabs.kabouter.automation;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
-import com.unicornlabs.kabouter.devices.DeviceInfo;
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
@@ -50,7 +50,7 @@ public class AutomationManager implements DeviceEventListener{
     }
     
     public void forceIOState(String deviceId, int ioNum, int value) {
-        DeviceInfo di = theDeviceManager.getDeviceInfo(deviceId);
+        DeviceStatus di = theDeviceManager.getDeviceStatus(deviceId);
         
         if(di == null) {
             LOGGER.log(Level.SEVERE, "Invalid Device ID specified in IO Override: {0}", deviceId);
@@ -65,7 +65,7 @@ public class AutomationManager implements DeviceEventListener{
     @Override
     public void handleDeviceEvent(DeviceEvent e) {
         if(e.getEventType().equals(DeviceEvent.IO_CHANGE_EVENT)) {
-            DeviceInfo theDeviceInfo = (DeviceInfo) e.getAttachment();
+            DeviceStatus theDeviceInfo = (DeviceStatus) e.getAttachment();
             LOGGER.log(Level.INFO, "Handling IO Change Event for Device {0}", theDeviceInfo.theDevice.getId());
             
             //TODO Remove this, test case only

@@ -16,9 +16,8 @@
  */
 // </editor-fold>
 
-package com.unicornlabs.kabouter.devices;
+package com.unicornlabs.kabouter.devices.messaging;
 
-import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +42,6 @@ public class DeviceServerMessage {
     }
     
     public String messageType;
-    public Device device;
-    public String data;
+    public Object data;
 
 }
