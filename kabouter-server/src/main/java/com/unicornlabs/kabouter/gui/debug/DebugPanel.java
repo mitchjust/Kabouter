@@ -17,13 +17,18 @@ package com.unicornlabs.kabouter.gui.debug;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.DeviceManager;
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
+import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -39,7 +44,7 @@ public class DebugPanel extends javax.swing.JPanel {
     static {
         LOGGER.setLevel(Level.ALL);
     }
-    
+
     /**
      * Creates new form DebugPanel
      */
@@ -163,74 +168,56 @@ public class DebugPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void historianDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historianDataButtonActionPerformed
-        try {
-            this.setEnabled(false);
-            int entries = Integer.parseInt(historianDataEntriesTextField.getText());
-            String deviceId = historianDataDeviceIdTextField.getText();
-            Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
-            DeviceManager theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
-            
-            Calendar theCalendar = Calendar.getInstance();
-            
-            theDeviceManager.insertNewDevice(deviceId, "KABOUTER_TEST_DEVICE", deviceId);
-            
-            Random r = new Random(); 
-            ArrayList<Powerlog> powerlogs = new ArrayList<Powerlog>();
-            
-            LOGGER.info("Generating Logs...");
-            
-            int count = 0;
-            int currentSectionLength = r.nextInt(100);
-            float setPoint = r.nextFloat() * (float)r.nextInt(1000);
-            
-            for(int pass =0; pass<entries; pass++) {
-                powerlogs.clear();
-                for(int i=0;i<1000;i++) {
 
-                    if(count >= currentSectionLength) {
-                        currentSectionLength = r.nextInt(60*60*4);
-                        count = 0;
-                        setPoint = r.nextFloat() * (float)r.nextInt(1000);
-                    }
+        this.setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+        DeviceManager theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        int entries = Integer.parseInt(historianDataEntriesTextField.getText());
+        String deviceId = historianDataDeviceIdTextField.getText();
 
-                    double d = setPoint+r.nextDouble()*100;
-                    PowerlogId id = new PowerlogId(theCalendar.getTime(), deviceId);
-                    Powerlog log = new Powerlog(id, d);
-                    powerlogs.add(log);
-                    theCalendar.add(Calendar.MINUTE, -1);
-                    count++;
-                }
-                LOGGER.log(Level.INFO, "Sending Logs To Historian '{'Pass {0}'}'", pass);
-            
-                theHistorian.savePowerlogs(powerlogs);
-            }
-            
-            
-            
-            JOptionPane.showMessageDialog(this, "Added " + entries + " new entries","Complete",JOptionPane.INFORMATION_MESSAGE);
-            
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(this, "Invalid Entries", "Error", JOptionPane.ERROR_MESSAGE);
+        double prevPower = 0;
+        double currentPower = 0;
+        double dev = 10;
+        Random r = new Random();
+        Calendar c = Calendar.getInstance();
+        DeviceStatus deviceStatus = theDeviceManager.getDeviceStatus(deviceId);
+
+        if (deviceStatus == null) {
+            theDeviceManager.insertNewDevice(deviceId, "KABOUTER_TEST_DEVICE", "0.0.0.0");
         }
-        
+
+        for (int i = 0; i < entries; i++) {
+            currentPower = prevPower + (r.nextDouble()*dev - dev/2);
+            while(currentPower < 0) {
+                currentPower += dev;
+            }
+            Powerlog p = new Powerlog(new PowerlogId(c.getTime(),deviceId),currentPower);
+            theHistorian.savePowerlog(p);
+            c.add(Calendar.MINUTE, -1);
+            prevPower = currentPower;
+        }
+
+        JOptionPane.showMessageDialog(this, "Added " + entries + " new entries", "Complete", JOptionPane.INFORMATION_MESSAGE);
+
+        setCursor(Cursor.getDefaultCursor());
         this.setEnabled(true);
 
     }//GEN-LAST:event_historianDataButtonActionPerformed
 
     private void clearDevicesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearDevicesButtonActionPerformed
         int showConfirmDialog = JOptionPane.showConfirmDialog(this, "Really Delete All Device Logs?", "Confirmation", JOptionPane.OK_CANCEL_OPTION);
-        
-        if(showConfirmDialog == JOptionPane.CANCEL_OPTION) {
+
+        if (showConfirmDialog == JOptionPane.CANCEL_OPTION) {
             return;
         }
-        
+
         Historian theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         ArrayList<Device> devices = theHistorian.getDevices();
-        for(Device d : devices) {
+        for (Device d : devices) {
             theHistorian.deleteDevice(d);
         }
     }//GEN-LAST:event_clearDevicesButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearDevicesButton;
     private javax.swing.JButton historianDataButton;
