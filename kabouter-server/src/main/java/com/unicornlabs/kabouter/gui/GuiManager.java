@@ -27,8 +27,10 @@ import com.unicornlabs.kabouter.gui.debug.DebugPanel;
 import com.unicornlabs.kabouter.gui.power.PowerPanel;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.awt.Component;
+import java.awt.Frame;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -86,8 +88,10 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
      */
     public void initalize() {
         myMainFrame.addTabbedPaneChangeListener(this);
-        myMainFrame.setVisible(true);
         theDeviceManager.addDeviceEventListener(this);
+        myMainFrame.setVisible(true);
+        //Start with frame maximized
+        myMainFrame.setExtendedState(myMainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
     /**
