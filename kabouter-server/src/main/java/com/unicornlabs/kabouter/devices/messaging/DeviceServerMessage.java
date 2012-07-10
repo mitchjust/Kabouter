@@ -35,7 +35,7 @@ public class DeviceServerMessage {
     
     public static final String DEVICE_CONFIG = "DEVICE_CONFIG";
     public static final String POWER_LOG = "POWER_LOG";
-    public static final String IO_STATE_CHANGE = "IO_STATE_CHANGE";
+    public static final String IO_STATE_UPDATE = "IO_STATE_UPDATE";
     
     static{
         LOGGER.setLevel(Level.ALL);

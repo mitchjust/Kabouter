@@ -168,9 +168,6 @@ public class DeviceManager {
         myDeviceStatuses.put(newDevice.getId(), newDeviceStatus);
         theHistorian.saveDevice(newDevice);
         
-        DeviceEvent e = new DeviceEvent(this, DeviceEvent.NEW_DEVICE_EVENT, newDeviceStatus);
-        fireDeviceEvent(e);
-        
         return newDeviceStatus;
         
     }
@@ -217,6 +214,10 @@ public class DeviceManager {
         }
         
         return deviceDisplayNames;
+    }
+
+    public void updateDeviceStatus(DeviceStatus deviceStatus) {
+        theHistorian.updateDevice(deviceStatus.theDevice);
     }
 
 }

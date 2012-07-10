@@ -18,8 +18,8 @@
 package com.unicornlabs.kabouter.automation;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
-import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.DeviceManager;
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.historian.Historian;

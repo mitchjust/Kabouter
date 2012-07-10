@@ -27,10 +27,7 @@ import com.unicornlabs.kabouter.historian.data_objects.PowerlogId;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.*;
 
 /**
  * KabouterDeviceHandler.java
@@ -65,13 +62,22 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
     }
 
     @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
+        Device device = deviceInfo.theDevice;
+        LOGGER.log(Level.INFO, "Device Connection Gracefully Closed: {0}",device.getId());
+        deviceInfo.isConnected = false;
+        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceInfo);
+        theDeviceManager.fireDeviceEvent(newDeviceEvent);
+    }
+    
+    @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         DeviceServerMessage message = (DeviceServerMessage) e.getMessage();
         DeviceStatus deviceStatus = (DeviceStatus) ctx.getAttachment();
 
         if (deviceStatus == null) {
-            //First connection from a new device
-            LOGGER.log(Level.INFO, "First Communications With A New Device");
+            //First connection from a device
 
             if (!message.messageType.contentEquals(DeviceServerMessage.DEVICE_CONFIG)) {
                 LOGGER.severe("Device did not send Configuration Message");
@@ -91,20 +97,27 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
             if (deviceStatus == null) {
                 //Device has never connected before
                 deviceStatus = theDeviceManager.insertNewDevice(split[0], split[1], ctx.getChannel().getRemoteAddress().toString());
+                LOGGER.log(Level.INFO, "New Device Has Connected: {0}", deviceStatus.theDevice.getDisplayname());
+            } else {
+                LOGGER.log(Level.INFO, "Familiar Device Has Connected: {0}", deviceStatus.theDevice.getDisplayname());
             }
 
             //Set device as ready and attach comms channel
             deviceStatus.isConnected = true;
             deviceStatus.tcpChannel = ctx.getChannel();
-            
+
             //Attach devicestatus to the channel context
             ctx.setAttachment(deviceStatus);
 
             LOGGER.log(Level.INFO, "Successfully configured Device: {0}", deviceStatus.theDevice.getId());
+
+            //Fire device connection event
+            DeviceEvent event = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_CONNECTION_EVENT, deviceStatus);
+            theDeviceManager.fireDeviceEvent(event);
         } else {
             //Device is already connected, handle possible messages
 
-            if (message.messageType.contentEquals(DeviceServerMessage.IO_STATE_CHANGE)) {
+            if (message.messageType.contentEquals(DeviceServerMessage.IO_STATE_UPDATE)) {
             } else if (message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
                 Double value = (Double) message.data;
                 Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), deviceStatus.theDevice.getId()), value);

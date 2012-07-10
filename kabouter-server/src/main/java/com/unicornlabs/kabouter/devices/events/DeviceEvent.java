@@ -36,7 +36,7 @@ public class DeviceEvent extends EventObject {
         LOGGER.setLevel(Level.ALL);
     }
     //Event types
-    public static final String NEW_DEVICE_EVENT = "NEW_DEVICE_EVENT";
+    public static final String DEVICE_CONNECTION_EVENT = "DEVICE_CONNECTION_EVENT";
     public static final String DEVICE_DISCONNECTION_EVENT = "DEVICE_DISCONNECTION_EVENT";
     public static final String IO_CHANGE_EVENT = "IO_CHANGE_EVENT";
     public static final String POWER_LOG_EVENT = "POWER_LOG_EVENT";

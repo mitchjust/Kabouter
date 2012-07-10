@@ -115,7 +115,7 @@ public class TestDevice {
                 
                 DeviceServerMessage newMessage = new DeviceServerMessage();
                 newMessage.data = JSONUtils.ToJSON(newIo);
-                newMessage.messageType = DeviceServerMessage.IO_STATE_CHANGE;
+                newMessage.messageType = DeviceServerMessage.IO_STATE_UPDATE;
                 
                 String jsonString = JSONUtils.ToJSON(newMessage);
                 

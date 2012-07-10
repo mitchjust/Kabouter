@@ -19,15 +19,14 @@ package com.unicornlabs.kabouter.gui;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.config.KabouterConstants;
-import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
 import com.unicornlabs.kabouter.gui.debug.DebugPanel;
+import com.unicornlabs.kabouter.gui.devices.DevicesPanel;
 import com.unicornlabs.kabouter.gui.power.PowerPanel;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
 import java.awt.Component;
-import java.awt.Frame;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -53,6 +52,7 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
     private DeviceManager theDeviceManager;
     private MainFrame myMainFrame;
     private MainPanel myMainPanel;
+    private DevicesPanel myDevicesPanel;
     private PowerPanel myPowerPanel;
     private DebugPanel myDebugPanel;
 
@@ -72,12 +72,15 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
         //Setup panels
         myMainPanel = new MainPanel();
 
+        myDevicesPanel = new DevicesPanel();
+
         myPowerPanel = new PowerPanel();
 
         myDebugPanel = new DebugPanel();
 
         //Add panels as tabs
         myMainFrame.addTabbedPanel("Home", myMainPanel);
+        myMainFrame.addTabbedPanel("Devices", myDevicesPanel);
         myMainFrame.addTabbedPanel("Power Logs", myPowerPanel);
         myMainFrame.addTabbedPanel("Debug", myDebugPanel);
 
@@ -107,6 +110,9 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
 
         if (selectedComponent == myMainPanel) {
             LOGGER.info("Tab changed to Main Panel");
+        } else if (selectedComponent == myDevicesPanel) {
+            LOGGER.info("Tab changed to Devices Panel");
+            myDevicesPanel.devicesTable.updateTableData();
         } else if (selectedComponent == myPowerPanel) {
             LOGGER.info("Tab changed to Power Panel");
             myPowerPanel.updateDeviceList();
@@ -129,25 +135,33 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
 
             @Override
             public void run() {
+                Component currentTab = myMainFrame.getCurrentTab();
+                String eventType = e.getEventType();
 
-                if (e.getEventType().equals(DeviceEvent.NEW_DEVICE_EVENT)) {
-                    //Actions for New Power Logs
-                    if (myMainFrame.getCurrentTab() == myPowerPanel) {
-                        //Action for power panel
-                        myPowerPanel.updateDeviceList();
+                if (currentTab == myMainPanel) {
+                    //Main Panel Handlers
+                } else if (currentTab == myDevicesPanel) {
+                    //Devices Panel Handlers
+                    if (eventType.equals(DeviceEvent.DEVICE_CONNECTION_EVENT)) {
+                        myDevicesPanel.devicesTable.updateTableData();
+                    } else if (eventType.equals(DeviceEvent.DEVICE_DISCONNECTION_EVENT)) {
+                        myDevicesPanel.devicesTable.updateTableData();
                     }
-                } else if (e.getEventType().equals(DeviceEvent.POWER_LOG_EVENT)) {
-                    //Actions for New Power Logs
-                    if (myMainFrame.getCurrentTab() == myPowerPanel) {
-                        //Action for power panel
-                        
+                } else if (currentTab == myPowerPanel) {
+                    //Power Panel Handlers
+                    if (eventType.equals(DeviceEvent.DEVICE_CONNECTION_EVENT)) {
+                        myPowerPanel.updateDeviceList();
+                    } else if (eventType.equals(DeviceEvent.POWER_LOG_EVENT)) {
                         //If the power panel is in live mode, update it
                         if (myPowerPanel.getLiveStatus() == true) {
                             Powerlog newLog = (Powerlog) e.getAttachment();
                             myPowerPanel.handleNewPowerLog(newLog);
                         }
                     }
+                } else if (currentTab == myDebugPanel) {
+                    //Debug Panel Handlers
                 }
+
             }
         });
 
