@@ -24,7 +24,6 @@ import com.unicornlabs.kabouter.util.JSONUtils;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,8 +89,11 @@ public class TestDevice {
                 
                 DeviceServerMessage newMessage = new DeviceServerMessage();
                 
+                System.out.print("Device Id: ");
+                String devId = br.readLine();
+                
                 newMessage.messageType = DeviceServerMessage.DEVICE_CONFIG;
-                newMessage.data = "TEST_DEVICE:KABOUTER_TEST_DEVICE";
+                newMessage.data = devId+":KABOUTER_TEST_DEVICE";
                 
                 String jsonString = JSONUtils.ToJSON(newMessage);
                 
