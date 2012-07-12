@@ -52,8 +52,6 @@ public class JSONEncoder extends OneToOneEncoder {
     protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
         String jsonString = JSONUtils.ToJSON(o);
 
-        LOGGER.log(Level.INFO, "Writing JSON String:\n{0}", jsonString);
-
         return jsonString;
     }
 }

@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 // </editor-fold>
-
 package com.unicornlabs.kabouter.clients.test;
 
-import com.unicornlabs.kabouter.clients.ClientServerMessage;
+import com.unicornlabs.kabouter.clients.messaging.ClientMessage;
 import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.util.JSONUtils;
 import java.io.*;
@@ -29,108 +28,98 @@ import java.util.logging.Logger;
 
 /**
  * TestClient.java
+ *
  * @author Mitchell Just <mitch.just@gmail.com>
  *
- * Description:
- * TODO Add Class Description
+ * Description: TODO Add Class Description
  */
-
 public class TestClient {
 
     private static final Logger LOGGER = Logger.getLogger(TestClient.class.getName());
-    
-    static{
+
+    static {
         LOGGER.setLevel(Level.ALL);
     }
-    
     private static Socket mySocket;
     private static BufferedReader socketin;
     private static PrintWriter socketout;
-    
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
-        
+
+
         String input = "";
-        
-        while(true) {
+
+        while (true) {
             input = br.readLine();
             handleCommand(input);
         }
     }
-    
+
     public static void handleCommand(String command) {
-        if(command.equals("quit")) {
+        if (command.equals("quit")) {
             try {
                 mySocket.close();
                 System.exit(0);
             } catch (IOException ex) {
                 System.out.println("ex = " + ex);
             }
-        }
-        
-        else if(command.startsWith("connect")) {
+        } else if (command.startsWith("connect")) {
             try {
-                
+
                 String[] split = command.split(" ");
-                
-                if(split.length == 3) {
-                
-                mySocket = new Socket(InetAddress.getByName(split[1]), Integer.parseInt(split[2]));
-                }
-                else {
+
+                if (split.length == 3) {
+
+                    mySocket = new Socket(InetAddress.getByName(split[1]), Integer.parseInt(split[2]));
+                } else {
                     mySocket = new Socket(InetAddress.getLocalHost(), 4646);
                 }
-                
+
                 System.out.println("Connection Established");
-                
-                
+
+
                 socketin = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
                 socketout = new PrintWriter(new OutputStreamWriter(mySocket.getOutputStream()));
-                
+
                 String deviceListJson = socketin.readLine();
-                
+
                 System.out.println("deviceListJson = " + deviceListJson);
-                DeviceStatus[] FromJSON = JSONUtils.FromJSON(deviceListJson, DeviceStatus[].class);
-                
-                System.out.println("FromJSON.length = " + FromJSON.length);
-                
-                for(DeviceStatus d : FromJSON) {
-                    System.out.println("Device:\n" + d);
+                ClientMessage FromJSON = JSONUtils.FromJSON(deviceListJson, ClientMessage.class);
+
+                System.out.println("FromJSON.messageType = " + FromJSON.messageType);
+                System.out.println("FromJSON.data = " + FromJSON.data);
+                DeviceStatus[] FromJSON1 = JSONUtils.FromJSON(FromJSON.data, DeviceStatus[].class);
+
+                for (DeviceStatus d : FromJSON1) {
+                    System.out.println("d = " + d);
                 }
+
+            } catch (Exception ex) {
+                System.out.println("ex = " + ex);
+            }
+        } else if (command.startsWith("register")) {
+            try {
+                String[] split = command.split(" ");
+
+                if (split.length != 2) {
+                    System.out.println("errrrr");
+                }
+
+                String device = split[1];
+
+                System.out.println("Registering To Device " + device);
+
+                ClientMessage message = new ClientMessage(ClientMessage.REGISTER_DEVICE_INTEREST_MESSAGE, device);
+                String ToJSON = JSONUtils.ToJSON(message);
+
+                System.out.println("ToJSON = " + ToJSON);
+
+                mySocket.getOutputStream().write(ToJSON.getBytes());
             } catch (Exception ex) {
                 System.out.println("ex = " + ex);
             }
         }
-        
-        else if(command.startsWith("getinfo")) {
-            try {
-                String[] split = command.split(" ");
-                String deviceId = split[1];
-                System.out.println("Requesting Device Info for ID = " + deviceId);
-                
-                ClientServerMessage newClientServerMessage = new ClientServerMessage();
-                newClientServerMessage.deviceId = deviceId;
-                newClientServerMessage.messageType = ClientServerMessage.DEVICE_INFO_REQUEST;
-                
-                String jsonString = JSONUtils.ToJSON(newClientServerMessage);
-                
-                System.out.println("jsonString = " + jsonString);
-                
-                mySocket.getOutputStream().write(jsonString.getBytes());
-                
-                String deviceInfo = socketin.readLine();
-                    
-                System.out.println("deviceInfo = " + deviceInfo);
-                DeviceStatus FromJSON = JSONUtils.FromJSON(deviceInfo, DeviceStatus.class);
-                    
-                System.out.println("FromJSON = " + FromJSON);
-            } catch (IOException ex) {
-                System.out.println("ex = " + ex);
-            } catch (com.google.gson.JsonSyntaxException jex) {
-                System.out.println("Exception: " + jex);
-            }
-        }
-    }
 
+    }
 }

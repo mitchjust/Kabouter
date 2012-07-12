@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.clients;
 
+import com.unicornlabs.kabouter.clients.messaging.ClientMessage;
 import com.unicornlabs.kabouter.net.JSONDecoder;
 import com.unicornlabs.kabouter.net.JSONEncoder;
 import java.util.logging.Level;
@@ -63,7 +64,7 @@ public class KabouterClientPipelineFactory implements
         myPipeline.addLast("stringencoder", new StringEncoder());
 
         //Attach JSON en/decoders
-        myPipeline.addLast("jsondecoder", new JSONDecoder<ClientServerMessage>(ClientServerMessage.class));
+        myPipeline.addLast("jsondecoder", new JSONDecoder<ClientMessage>(ClientMessage.class));
         myPipeline.addLast("jsonencoder", new JSONEncoder());
 
         //Attach a Kabouter Client Handler at the end of the stream

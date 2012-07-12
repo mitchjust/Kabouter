@@ -65,7 +65,7 @@ public class AutomationManager implements DeviceEventListener{
     @Override
     public void handleDeviceEvent(DeviceEvent e) {
         if(e.getEventType().equals(DeviceEvent.IO_CHANGE_EVENT)) {
-            DeviceStatus theDeviceInfo = (DeviceStatus) e.getAttachment();
+            DeviceStatus theDeviceInfo = (DeviceStatus) e.getOriginDevice();
             LOGGER.log(Level.INFO, "Handling IO Change Event for Device {0}", theDeviceInfo.theDevice.getId());
             
             //TODO Remove this, test case only

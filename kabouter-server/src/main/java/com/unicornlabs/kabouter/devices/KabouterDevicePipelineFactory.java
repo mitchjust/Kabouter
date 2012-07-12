@@ -19,7 +19,6 @@
 package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
-import com.unicornlabs.kabouter.clients.ClientServerMessage;
 import com.unicornlabs.kabouter.net.JSONDecoder;
 import com.unicornlabs.kabouter.net.JSONEncoder;
 import java.util.logging.Level;

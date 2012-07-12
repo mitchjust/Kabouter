@@ -53,21 +53,21 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
-        Device device = deviceInfo.theDevice;
+        DeviceStatus deviceStatus = (DeviceStatus) ctx.getAttachment();
+        Device device = deviceStatus.theDevice;
         LOGGER.log(Level.SEVERE, "Exception Caught for Device {0}:\n{1}", new Object[]{device.getId(), e.getCause().getMessage()});
-        deviceInfo.isConnected = false;
-        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceInfo);
+        deviceStatus.isConnected = false;
+        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceStatus, null);
         theDeviceManager.fireDeviceEvent(newDeviceEvent);
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        DeviceStatus deviceInfo = (DeviceStatus) ctx.getAttachment();
-        Device device = deviceInfo.theDevice;
+        DeviceStatus deviceStatus = (DeviceStatus) ctx.getAttachment();
+        Device device = deviceStatus.theDevice;
         LOGGER.log(Level.INFO, "Device Connection Gracefully Closed: {0}",device.getId());
-        deviceInfo.isConnected = false;
-        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceInfo);
+        deviceStatus.isConnected = false;
+        DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceStatus, null);
         theDeviceManager.fireDeviceEvent(newDeviceEvent);
     }
     
@@ -112,7 +112,7 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
             LOGGER.log(Level.INFO, "Successfully configured Device: {0}", deviceStatus.theDevice.getId());
 
             //Fire device connection event
-            DeviceEvent event = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_CONNECTION_EVENT, deviceStatus);
+            DeviceEvent event = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_CONNECTION_EVENT, deviceStatus, null);
             theDeviceManager.fireDeviceEvent(event);
         } else {
             //Device is already connected, handle possible messages
@@ -122,7 +122,7 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
                 Double value = (Double) message.data;
                 Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), deviceStatus.theDevice.getId()), value);
                 theHistorian.savePowerlog(newPowerlog);
-                DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, newPowerlog);
+                DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, deviceStatus, newPowerlog);
                 theDeviceManager.fireDeviceEvent(devicePowerEvent);
 
             }

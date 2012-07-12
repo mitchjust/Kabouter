@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.devices.events;
 
+import com.unicornlabs.kabouter.devices.DeviceStatus;
 import java.util.EventObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ public class DeviceEvent extends EventObject {
     
     //Attached objects
     private Object attachment;
+    private DeviceStatus originDevice;
     
     //The event type
     private String eventType;
@@ -53,10 +55,11 @@ public class DeviceEvent extends EventObject {
      * @param eventType type of event
      * @param attachment attachment
      */
-    public DeviceEvent(Object o, String eventType, Object attachment) {
+    public DeviceEvent(Object o, String eventType, DeviceStatus originDevice, Object attachment) {
         super(o);
         this.eventType = eventType;
         this.attachment = attachment;
+        this.originDevice = originDevice;
     }
 
     /**
@@ -64,8 +67,8 @@ public class DeviceEvent extends EventObject {
      * @param o source of event
      * @param eventType type of event
      */
-    public DeviceEvent(Object o, String eventType) {
-        this(o, eventType, null);
+    public DeviceEvent(Object o, String eventType, DeviceStatus originDevice) {
+        this(o, eventType, originDevice, null);
     }
 
     /**
@@ -83,4 +86,10 @@ public class DeviceEvent extends EventObject {
     public String getEventType() {
         return eventType;
     }
+
+    public DeviceStatus getOriginDevice() {
+        return originDevice;
+    }
+    
+    
 }

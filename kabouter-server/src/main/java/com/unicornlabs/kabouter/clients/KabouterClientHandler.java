@@ -18,8 +18,9 @@
 package com.unicornlabs.kabouter.clients;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
-import com.unicornlabs.kabouter.devices.DeviceStatus;
+import com.unicornlabs.kabouter.clients.messaging.ClientMessage;
 import com.unicornlabs.kabouter.devices.DeviceManager;
+import com.unicornlabs.kabouter.util.JSONUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jboss.netty.channel.*;
@@ -42,12 +43,14 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
      * The device manager reference
      */
     private DeviceManager theDeviceManager;
+    private ClientManager theClientManager;
 
     /**
      * Bind to business objects
      */
     public KabouterClientHandler() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        theClientManager = (ClientManager) BusinessObjectManager.getBusinessObject(ClientManager.class.getName());
     }
 
     /**
@@ -60,12 +63,19 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
      */
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        ctx.getChannel().write(theDeviceManager.getDeviceStatuses());
+        LOGGER.info("New Client Connected: " + ctx.getChannel().getRemoteAddress());
+        KabouterClient newClient = theClientManager.clientConnected(ctx.getChannel());
+        ctx.setAttachment(newClient);
+        ctx.getChannel().write(new ClientMessage(ClientMessage.DEVICE_LIST_MESSAGE, theDeviceManager.getDeviceStatuses()));
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelDisconnected(ctx, e);
+        LOGGER.log(Level.INFO, "Client Disconnected: {0}", ctx.getChannel().getRemoteAddress());
+        KabouterClient client = (KabouterClient) ctx.getAttachment();
+        if (client != null) {
+            theClientManager.clientDisconnected(client);
+        }
     }
 
     @Override
@@ -74,31 +84,18 @@ public class KabouterClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
-        super.handleUpstream(ctx, e);
-    }
-
-    @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        if (!(e.getMessage() instanceof ClientServerMessage)) {
-            LOGGER.log(Level.SEVERE, "Unknown Message Received: \n{0}", e.getMessage());
-        }
-
-        ClientServerMessage message = (ClientServerMessage) e.getMessage();
-
-        if (message.messageType.contentEquals(ClientServerMessage.DEVICE_INFO_REQUEST)) {
-            DeviceStatus di = theDeviceManager.getDeviceStatus(message.deviceId);
-
-            if (di == null) {
-                LOGGER.log(Level.SEVERE, "Device Requested unknown device id: {0}", message.deviceId);
-                ctx.getChannel().write("Unknown Device ID!");
-            } else {
-                ctx.getChannel().write(theDeviceManager.getDeviceStatus(message.deviceId));
+        if (e.getMessage() instanceof ClientMessage) {
+            ClientMessage message = (ClientMessage) e.getMessage();
+            if(message.messageType.contentEquals(ClientMessage.REGISTER_DEVICE_INTEREST_MESSAGE)) {
+                String deviceOfInterest = JSONUtils.FromJSON(message.data, String.class);
+                LOGGER.log(Level.INFO, "Registering Device Of Interest: {0} For Client at: {1}", new Object[]{deviceOfInterest, e.getRemoteAddress()});
+                KabouterClient client = (KabouterClient) ctx.getAttachment();
+                client.deviceOfInterest=deviceOfInterest;
             }
-        } else if (message.messageType.contentEquals(ClientServerMessage.DEVICE_CONTROL_REQUEST)) {
-            //TODO Handle io change
-        } else {
-            LOGGER.log(Level.SEVERE, "Unknown Message Type: \n{0}", e.getMessage());
+        }
+        else {
+            System.out.println("chuck a shit");
         }
     }
 }
