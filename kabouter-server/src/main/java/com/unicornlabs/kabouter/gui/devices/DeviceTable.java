@@ -46,6 +46,7 @@ public class DeviceTable extends JTable {
     }
     private DefaultTableModel myModel;
     private DeviceManager theDeviceManager;
+    private DeviceStatus[] deviceStatuses;
 
     public DeviceTable() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
@@ -66,12 +67,23 @@ public class DeviceTable extends JTable {
 
     public void updateTableData() {
         
-        DeviceStatus[] data = theDeviceManager.getDeviceStatuses();
+        deviceStatuses = theDeviceManager.getDeviceStatuses();
         myModel.setRowCount(0);
-        for (DeviceStatus d : data) {
+        for (DeviceStatus d : deviceStatuses) {
             myModel.addRow(new Object[]{d.theDevice.getDisplayname(),
                         d.theDevice.getType(),
                         d.isConnected});
         }
+    }
+    
+    public DeviceStatus getSelectedDevice() {
+        int leadSelectionIndex = this.getSelectionModel().getLeadSelectionIndex();
+        
+        if(leadSelectionIndex == -1) {
+            //Table is updating
+            return null;
+        }
+        
+        return deviceStatuses[leadSelectionIndex];
     }
 }

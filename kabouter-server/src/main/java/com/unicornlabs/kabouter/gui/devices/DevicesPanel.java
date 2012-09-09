@@ -15,17 +15,23 @@
  */
 package com.unicornlabs.kabouter.gui.devices;
 
+import com.unicornlabs.kabouter.devices.DeviceStatus;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 /**
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  */
-public class DevicesPanel extends javax.swing.JPanel {
+public class DevicesPanel extends javax.swing.JPanel implements ListSelectionListener {
 
     /**
      * Creates new form DevicePanel
      */
     public DevicesPanel() {
+
         initComponents();
+        devicesTable.getSelectionModel().addListSelectionListener(this);
     }
 
     /**
@@ -83,4 +89,15 @@ public class DevicesPanel extends javax.swing.JPanel {
     public com.unicornlabs.kabouter.gui.devices.DeviceTable devicesTable;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        
+        if(!e.getValueIsAdjusting()) {
+            DeviceStatus d = devicesTable.getSelectedDevice();
+            deviceInfoPanel1.setSelectedDevice(d);
+        }
+    }
+
+
 }

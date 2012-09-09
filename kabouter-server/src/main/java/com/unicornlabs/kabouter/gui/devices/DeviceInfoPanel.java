@@ -24,7 +24,7 @@ import com.unicornlabs.kabouter.devices.DeviceStatus;
  * @author Mitchell Just <mitch.just@gmail.com>
  */
 public class DeviceInfoPanel extends javax.swing.JPanel {
-    
+
     private DeviceManager theDeviceManager;
     private DeviceStatus selectedDeviceStatus;
     private DevicesPanel myParent;
@@ -36,6 +36,28 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         this.myParent = parent;
         initComponents();
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+    }
+
+    public void setSelectedDevice(DeviceStatus d) {
+        selectedDeviceStatus = d;
+        updateFields();
+    }
+
+    public void updateFields() {
+        if (selectedDeviceStatus != null) {
+            this.deviceIdField.setText(selectedDeviceStatus.theDevice.getId());
+            this.deviceNameField.setText(selectedDeviceStatus.theDevice.getDisplayname());
+            this.deviceIpField.setText(selectedDeviceStatus.theDevice.getIpaddress());
+            this.deviceTypeField.setText(selectedDeviceStatus.theDevice.getType());
+            this.jCheckBox1.setSelected(selectedDeviceStatus.isConnected);
+        }
+        else {
+            this.deviceIdField.setText("");
+            this.deviceNameField.setText("");
+            this.deviceIpField.setText("");
+            this.deviceTypeField.setText("");
+            this.jCheckBox1.setSelected(false);
+        }
     }
 
     /**
@@ -57,7 +79,6 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
-        updateButton = new javax.swing.JButton();
 
         jLabel4.setText("Device IP:");
 
@@ -69,6 +90,8 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Device Name:");
 
+        deviceNameField.setEditable(false);
+
         deviceIdField.setEditable(false);
 
         jLabel5.setText("Device ID:");
@@ -76,13 +99,6 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         jLabel6.setText("Connected:");
 
         jCheckBox1.setEnabled(false);
-
-        updateButton.setText("Update");
-        updateButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateButtonActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -99,14 +115,11 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(deviceIdField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(updateButton))
+                    .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(deviceTypeField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(deviceIpField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jCheckBox1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,8 +131,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(updateButton))
+                    .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -132,16 +144,9 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel6)
                     .addComponent(jCheckBox1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(10, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        String newDeviceName = deviceNameField.getText();
-        selectedDeviceStatus.theDevice.setDisplayname(newDeviceName);
-        theDeviceManager.updateDeviceStatus(selectedDeviceStatus);
-        myParent.devicesTable.updateTableData();
-    }//GEN-LAST:event_updateButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField deviceIdField;
@@ -154,6 +159,5 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
 }
