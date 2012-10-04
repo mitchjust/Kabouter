@@ -19,6 +19,7 @@ import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
+import com.unicornlabs.kabouter.reporting.PowerReport;
 import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.Transparency;
@@ -51,7 +52,7 @@ public class PowerPanel extends javax.swing.JPanel {
     private Historian theHistorian;
     private DeviceManager theDeviceManager;
     private JFreeChart myChart;
-    private HashMap<String,XYSeries> myDataSeriesMap;
+    private HashMap<String, XYSeries> myDataSeriesMap;
     private XYSeriesCollection dataset;
 
     static {
@@ -83,18 +84,18 @@ public class PowerPanel extends javax.swing.JPanel {
 
         //Sort them alphabetically
         Collections.sort(deviceIds);
-        
+
         String[] deviceIdsAsStringArr = new String[deviceIds.size()];
         deviceIdsAsStringArr = deviceIds.toArray(deviceIdsAsStringArr);
 
         deviceList.setListData(deviceIdsAsStringArr);
-        
-        for(Object item : selectedValuesList) {
-            if(deviceIds.contains((String)item)) {
+
+        for (Object item : selectedValuesList) {
+            if (deviceIds.contains((String) item)) {
                 deviceList.setSelectedValue(item, true);
             }
         }
-        
+
         deviceList.setEnabled(true);
 
     }
@@ -106,9 +107,9 @@ public class PowerPanel extends javax.swing.JPanel {
     public void handleNewPowerLog(Powerlog newLog) {
         //If the new log is from the currently focussed device
         XYSeries focussedSeries = myDataSeriesMap.get(newLog.getId().getDeviceid());
-        
+
         //If we are focussed on this device, the returned series won't be null
-        if(focussedSeries != null) {
+        if (focussedSeries != null) {
 
             //Add the new datapoint
             focussedSeries.add(newLog.getId().getLogtime().getTime(), newLog.getPower());
@@ -138,22 +139,22 @@ public class PowerPanel extends javax.swing.JPanel {
      * @param title the title of the chart
      */
     public void setupChart(ArrayList<Powerlog> logs, String title) {
-        
+
         myDataSeriesMap.clear();
-        
+
         //Create a collection to store the series
         dataset = new XYSeriesCollection();
 
         //Add each of the logs to the series
         for (Powerlog p : logs) {
             XYSeries deviceSeries = myDataSeriesMap.get(p.getId().getDeviceid());
-            
-            if(deviceSeries == null) {
+
+            if (deviceSeries == null) {
                 deviceSeries = new XYSeries(p.getId().getDeviceid());
                 myDataSeriesMap.put(p.getId().getDeviceid(), deviceSeries);
                 dataset.addSeries(deviceSeries);
             }
-            
+
             deviceSeries.add(p.getId().getLogtime().getTime(), p.getPower());
         }
 
@@ -180,7 +181,7 @@ public class PowerPanel extends javax.swing.JPanel {
 
         //Create the plot
         XYPlot plot = new XYPlot(dataset, dateAxis, powerAxis, renderer);
-        
+
         //Create the chart
         myChart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
@@ -380,7 +381,7 @@ public class PowerPanel extends javax.swing.JPanel {
             Date end = cal.getTime();
 
             ArrayList<Powerlog> logs = theHistorian.getPowerlogs(selectedValuesList, start, end, MAX_DATA_POINTS);
-            
+
             setupChart(logs, "Power");
         }
 
@@ -397,9 +398,37 @@ public class PowerPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_liveCheckBoxActionPerformed
 
     private void generateReportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateReportButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_generateReportButtonActionPerformed
+        Calendar cal = Calendar.getInstance();
+        cal.setTime((Date) startTimeSpinner.getValue());
 
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int min = cal.get(Calendar.MINUTE);
+        int sec = cal.get(Calendar.SECOND);
+
+        cal.setTime(startDateChooser.getDate());
+
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, min);
+        cal.set(Calendar.SECOND, sec);
+
+        Date start = cal.getTime();
+
+        cal.setTime((Date) endTimeSpinner.getValue());
+
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        min = cal.get(Calendar.MINUTE);
+        sec = cal.get(Calendar.SECOND);
+
+        cal.setTime(endDateChooser.getDate());
+
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, min);
+        cal.set(Calendar.SECOND, sec);
+
+        Date end = cal.getTime();
+
+        PowerReport.GeneratePowerReport(start, end);
+    }//GEN-LAST:event_generateReportButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
     private javax.swing.JPanel chartPanel;

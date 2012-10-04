@@ -43,6 +43,7 @@ public class TestDeviceGui extends javax.swing.JFrame {
      * Creates new form TestDeviceGui
      */
     public TestDeviceGui() {
+        setTitle("Kabouter Test Device");
         initComponents();
     }
 
