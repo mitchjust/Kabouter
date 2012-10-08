@@ -121,6 +121,10 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
         } else if (selectedComponent == myPowerPanel) {
             LOGGER.info("Tab changed to Power Panel");
             myPowerPanel.updateDeviceList();
+        } else if (selectedComponent == myAutomationPanel) {
+            LOGGER.info("Tab changed to Automation Panel");
+            myAutomationPanel.automationRuleTable.updateTableData();
+            myAutomationPanel.automationRuleInfoPanel.updateIdComboBoxes();
         } else if (selectedComponent == myDebugPanel) {
             LOGGER.info("Tab changed to Debug Panel");
         }

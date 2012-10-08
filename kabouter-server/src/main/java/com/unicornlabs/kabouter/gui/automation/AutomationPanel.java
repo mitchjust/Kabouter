@@ -15,17 +15,22 @@
  */
 package com.unicornlabs.kabouter.gui.automation;
 
+import com.unicornlabs.kabouter.historian.data_objects.Automationrule;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 /**
  *
  * @author Mitchell Just <mitch.just@gmail.com>
  */
-public class AutomationPanel extends javax.swing.JPanel {
+public class AutomationPanel extends javax.swing.JPanel  implements ListSelectionListener{
 
     /**
      * Creates new form AutomationPanel
      */
     public AutomationPanel() {
         initComponents();
+        automationRuleTable.getSelectionModel().addListSelectionListener(this);
     }
 
     /**
@@ -37,19 +42,48 @@ public class AutomationPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        automationRuleTable = new com.unicornlabs.kabouter.gui.automation.AutomationRuleTable();
+        automationRuleInfoPanel = new com.unicornlabs.kabouter.gui.automation.AutomationRuleInfoPanel();
+
         setPreferredSize(new java.awt.Dimension(800, 600));
+
+        jScrollPane1.setViewportView(automationRuleTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(automationRuleInfoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(automationRuleInfoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(52, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public com.unicornlabs.kabouter.gui.automation.AutomationRuleInfoPanel automationRuleInfoPanel;
+    public com.unicornlabs.kabouter.gui.automation.AutomationRuleTable automationRuleTable;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if(!e.getValueIsAdjusting()) {
+            Automationrule rule = automationRuleTable.getSelectedRule();
+            automationRuleInfoPanel.setSelectedRule(rule);
+        }
+    }
 }
