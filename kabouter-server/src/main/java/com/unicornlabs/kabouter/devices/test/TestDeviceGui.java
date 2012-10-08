@@ -27,6 +27,7 @@ import java.net.Socket;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JSlider;
 
 /**
  *
@@ -38,6 +39,7 @@ public class TestDeviceGui extends javax.swing.JFrame {
     private BufferedReader socketin;
     private PrintWriter socketout;
     private PowerGenerator myPowerGenerator;
+    private MessageReader myMessageReader;
 
     /**
      * Creates new form TestDeviceGui
@@ -65,6 +67,10 @@ public class TestDeviceGui extends javax.swing.JFrame {
         powerField = new javax.swing.JTextField();
         updateButton = new javax.swing.JButton();
         runButton = new javax.swing.JToggleButton();
+        tempSlider = new javax.swing.JSlider();
+        jLabel3 = new javax.swing.JLabel();
+        tempValue = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -104,6 +110,23 @@ public class TestDeviceGui extends javax.swing.JFrame {
             }
         });
 
+        tempSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tempSliderStateChanged(evt);
+            }
+        });
+
+        jLabel3.setText("Temp:");
+
+        tempValue.setText("0");
+
+        jCheckBox1.setText("Relay");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -117,19 +140,27 @@ public class TestDeviceGui extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel1))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(powerField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(powerField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(updateButton))
+                                    .addComponent(idField, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(updateButton))
-                            .addComponent(idField, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(runButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(runButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(tempSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tempValue, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox1)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -146,8 +177,15 @@ public class TestDeviceGui extends javax.swing.JFrame {
                     .addComponent(powerField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(updateButton)
                     .addComponent(runButton))
-                .addGap(14, 14, 14)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tempSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tempValue)
+                        .addComponent(jCheckBox1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -182,6 +220,9 @@ public class TestDeviceGui extends javax.swing.JFrame {
             idField.setEnabled(false);
             powerField.setEnabled(true);
             runButton.setEnabled(true);
+            
+            myMessageReader = new MessageReader(mySocket, this);
+            myMessageReader.start();
 
         } catch (IOException ex) {
             output(ex.getMessage());
@@ -218,6 +259,16 @@ public class TestDeviceGui extends javax.swing.JFrame {
             updateButton.setEnabled(false);
         }
     }//GEN-LAST:event_runButtonActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void tempSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tempSliderStateChanged
+        JSlider slider = (JSlider) evt.getSource();
+        int value = slider.getValue();
+        tempValue.setText(value + " deg");
+    }//GEN-LAST:event_tempSliderStateChanged
 
     /**
      * @param args the command line arguments
@@ -258,6 +309,44 @@ public class TestDeviceGui extends javax.swing.JFrame {
         outputArea.append(text + "\n");
         outputArea.setCaretPosition(outputArea.getDocument().getLength());
     }
+    
+    private static class MessageReader extends Thread {
+        private Socket mySocket;
+        private TestDeviceGui parent;
+        private boolean alive;
+        private BufferedReader br;
+
+        public MessageReader(Socket mySocket, TestDeviceGui parent) throws IOException {
+            this.mySocket = mySocket;
+            this.parent = parent;
+            this.alive = true;
+            br = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
+        }
+        
+        public void run() {
+            while(alive) {
+                try {
+                    String message = br.readLine();
+                    parent.output("Message recieved: " + message);
+                    String[] split = message.split(":");
+                    System.out.println("split[0] = " + split[0]);
+                    if (split[0].contentEquals("\"relay_io")) {
+                        
+                        Double d = Double.parseDouble(split[1].substring(0, split[1].length()-1));
+                        if(d > 0) {
+                            parent.jCheckBox1.setSelected(true);
+                        } else {
+                            parent.jCheckBox1.setSelected(false);
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(TestDeviceGui.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+        
+    }
 
     private static class PowerGenerator extends Thread {
 
@@ -290,8 +379,9 @@ public class TestDeviceGui extends javax.swing.JFrame {
             while (alive) {
                 try {
                     float value = r.nextFloat() * (baseLevel / 10) + baseLevel;
+                    float temp = parent.tempSlider.getValue();
                     DeviceServerMessage newMessage = new DeviceServerMessage();
-                    newMessage.data = value;
+                    newMessage.data = value+":"+temp;
                     newMessage.messageType = DeviceServerMessage.POWER_LOG;
 
                     String jsonString = JSONUtils.ToJSON(newMessage);
@@ -314,12 +404,16 @@ public class TestDeviceGui extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton connectButton;
     private javax.swing.JTextField idField;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea outputArea;
     private javax.swing.JTextField powerField;
     private javax.swing.JToggleButton runButton;
+    private javax.swing.JSlider tempSlider;
+    private javax.swing.JLabel tempValue;
     private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -17,6 +17,7 @@
 // </editor-fold>
 package com.unicornlabs.kabouter.historian;
 
+import com.unicornlabs.kabouter.historian.data_objects.Automationrule;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
 import com.unicornlabs.kabouter.historian.data_objects.Devicetemplate;
 import com.unicornlabs.kabouter.historian.data_objects.Powerlog;
@@ -443,4 +444,39 @@ public class Historian {
 
         return (Devicetemplate) result.get(0);
     }
+
+    public ArrayList<Automationrule> getAutomationRules() {
+        
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        LOGGER.info("Fetching Rules");
+        List result = session.createQuery("from Automationrule as automationrule").list();
+        session.getTransaction().commit();
+        session.close();
+        return (ArrayList<Automationrule>) result;
+    }
+    
+    public ArrayList<Automationrule> getAutomationRules(String sourceId) {
+        
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        LOGGER.info("Fetching Rules");
+        List result = session.createQuery("from Automationrule as automationrule where automationrule.sourceId ='" + sourceId + "'").list();
+        session.getTransaction().commit();
+        session.close();
+        return (ArrayList<Automationrule>) result;
+    }
+    
+    public ArrayList<Automationrule> getAutomationRules(String sourceId, String sourceIoName) {
+        
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        LOGGER.info("Fetching Rules");
+        List result = session.createQuery("from Automationrule as automationrule where automationrule.sourceId ='" + sourceId + "' and automationrule.sourceIoName ='" + sourceIoName +"'").list();
+        session.getTransaction().commit();
+        session.close();
+        return (ArrayList<Automationrule>) result;
+    }
+    
+    
 }

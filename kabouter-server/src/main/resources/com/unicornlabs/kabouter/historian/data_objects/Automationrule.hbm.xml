@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 08/10/2012 4:04:03 PM by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="com.unicornlabs.kabouter.historian.data_objects.Automationrule" table="automationrule" schema="kabouterserver">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="sourceId" type="string">
+            <column name="SourceId" />
+        </property>
+        <property name="sourceIoName" type="string">
+            <column name="SourceIoName" />
+        </property>
+        <property name="sourceFunction" type="string">
+            <column name="SourceFunction" />
+        </property>
+        <property name="sourceValue" type="java.lang.Double">
+            <column name="SourceValue" precision="17" scale="17" />
+        </property>
+        <property name="targetId" type="string">
+            <column name="TargetId" />
+        </property>
+        <property name="targetIoName" type="string">
+            <column name="TargetIoName" />
+        </property>
+        <property name="targetValue" type="java.lang.Double">
+            <column name="TargetValue" precision="17" scale="17" />
+        </property>
+    </class>
+</hibernate-mapping>

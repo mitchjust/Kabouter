@@ -5,4 +5,5 @@
   <table-filter match-name="powerlog"/>
   <table-filter match-name="device"/>
   <table-filter match-name="devicetemplate"/>
+  <table-filter match-name="automationrule"/>
 </hibernate-reverse-engineering>

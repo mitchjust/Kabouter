@@ -19,6 +19,7 @@ package com.unicornlabs.kabouter.devices;
 
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
+import com.unicornlabs.kabouter.devices.events.IOEvent;
 import com.unicornlabs.kabouter.devices.messaging.DeviceServerMessage;
 import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
@@ -65,12 +66,12 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         DeviceStatus deviceStatus = (DeviceStatus) ctx.getAttachment();
         Device device = deviceStatus.theDevice;
-        LOGGER.log(Level.INFO, "Device Connection Gracefully Closed: {0}",device.getId());
+        LOGGER.log(Level.INFO, "Device Connection Gracefully Closed: {0}", device.getId());
         deviceStatus.isConnected = false;
         DeviceEvent newDeviceEvent = new DeviceEvent(theDeviceManager, DeviceEvent.DEVICE_DISCONNECTION_EVENT, deviceStatus, null);
         theDeviceManager.fireDeviceEvent(newDeviceEvent);
     }
-    
+
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         DeviceServerMessage message = (DeviceServerMessage) e.getMessage();
@@ -119,12 +120,23 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
 
             if (message.messageType.contentEquals(DeviceServerMessage.IO_STATE_UPDATE)) {
             } else if (message.messageType.contentEquals(DeviceServerMessage.POWER_LOG)) {
-                Double value = (Double) message.data;
-                Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), deviceStatus.theDevice.getId()), value);
-                theHistorian.savePowerlog(newPowerlog);
-                DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, deviceStatus, newPowerlog);
-                theDeviceManager.fireDeviceEvent(devicePowerEvent);
-
+                String data = (String) message.data;
+                String[] split = data.split(":");
+                if (split.length != 2) {
+                    LOGGER.log(Level.SEVERE, "Unknown Message Received From: ", deviceStatus.theDevice.getDisplayname()
+                            + "\nContents: " + data);
+                } else {
+                    Double powerValue = Double.parseDouble(split[0]);
+                    Double tempValue = Double.parseDouble(split[1]);
+                    Powerlog newPowerlog = new Powerlog(new PowerlogId(new Date(), deviceStatus.theDevice.getId()), powerValue);
+                    theHistorian.savePowerlog(newPowerlog);
+                    DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, deviceStatus, newPowerlog);
+                    theDeviceManager.fireDeviceEvent(devicePowerEvent);
+                    
+                    IOEvent tempIoEvent = new IOEvent("temp_io", tempValue);
+                    DeviceEvent deviceTempEvent = new DeviceEvent(theDeviceManager, DeviceEvent.IO_CHANGE_EVENT, deviceStatus, tempIoEvent);
+                    theDeviceManager.fireDeviceEvent(deviceTempEvent);
+                }
             }
 
         }

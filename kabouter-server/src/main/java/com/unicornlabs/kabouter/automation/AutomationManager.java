@@ -22,7 +22,10 @@ import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
+import com.unicornlabs.kabouter.devices.events.IOEvent;
 import com.unicornlabs.kabouter.historian.Historian;
+import com.unicornlabs.kabouter.historian.data_objects.Automationrule;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +39,11 @@ import java.util.logging.Logger;
 public class AutomationManager implements DeviceEventListener{
 
     private static final Logger LOGGER = Logger.getLogger(AutomationManager.class.getName());
-
+    private static final String EQUALS_FUNCTION = "EQUALS";
+    private static final String MORE_THAN_FUNCTION = "MORE THAN";
+    private static final String LESS_THAN_FUNCTION = "LESS THAN";
+    private static final String[] FUNCTIONS = {EQUALS_FUNCTION,MORE_THAN_FUNCTION,LESS_THAN_FUNCTION};
+    
     static {
         LOGGER.setLevel(Level.ALL);
     }
@@ -47,31 +54,53 @@ public class AutomationManager implements DeviceEventListener{
     public AutomationManager() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
+
     }
     
-    public void forceIOState(String deviceId, int ioNum, int value) {
-        DeviceStatus di = theDeviceManager.getDeviceStatus(deviceId);
-        
-        if(di == null) {
-            LOGGER.log(Level.SEVERE, "Invalid Device ID specified in IO Override: {0}", deviceId);
-            return;
+    public ArrayList<Automationrule> getAutomationRules() {
+        return theHistorian.getAutomationRules();
+    }
+    
+    public ArrayList<Automationrule> getAutomationRules(String sourceId, String sourceIoName) {
+        return theHistorian.getAutomationRules(sourceId, sourceIoName);
+    }
+    
+    public void handleRule(Automationrule rule, double sourceValue) {
+        if(rule.getSourceFunction().contentEquals(EQUALS_FUNCTION)) {
+            if(rule.getSourceValue() == sourceValue) {
+                setIOValue(rule.getTargetId(), rule.getTargetIoName(), rule.getTargetValue());
+            }
+        } else if(rule.getSourceFunction().contentEquals(MORE_THAN_FUNCTION)) {
+            if(sourceValue > rule.getSourceValue()) {
+                setIOValue(rule.getTargetId(), rule.getTargetIoName(), rule.getTargetValue());
+            }
+        } else if(rule.getSourceFunction().contentEquals(LESS_THAN_FUNCTION)) {
+            if(sourceValue < rule.getSourceValue()) {
+                setIOValue(rule.getTargetId(), rule.getTargetIoName(), rule.getTargetValue());
+            }
+        } else {
+            LOGGER.log(Level.SEVERE, "Unknown Function: {0}", rule.getSourceFunction());
         }
-        
-        di.ioStates[ioNum] = value;
-        
-        theDeviceManager.updateDeviceIOState(di);
+    }
+    
+    public void setIOValue(String deviceId, String ioName, double value) {
+        LOGGER.log(Level.INFO, "Sending IO Update Message To {0} [{1}]:{2}", new Object[]{deviceId, ioName, value});
+        DeviceStatus deviceStatus = theDeviceManager.getDeviceStatus(deviceId);
+        deviceStatus.tcpChannel.write(ioName+":"+value);
     }
 
     @Override
     public void handleDeviceEvent(DeviceEvent e) {
         if(e.getEventType().equals(DeviceEvent.IO_CHANGE_EVENT)) {
             DeviceStatus theDeviceInfo = (DeviceStatus) e.getOriginDevice();
-            LOGGER.log(Level.INFO, "Handling IO Change Event for Device {0}", theDeviceInfo.theDevice.getId());
+            IOEvent theIOEvent = (IOEvent) e.getAttachment();
             
-            //TODO Remove this, test case only
-            theDeviceInfo.ioStates = new Integer[]{(1-theDeviceInfo.ioStates[0]),(1-theDeviceInfo.ioStates[0])};
+            LOGGER.log(Level.INFO, "Device IO Event Received: {0} {1}", new Object[]{theDeviceInfo.theDevice.getId(), theIOEvent});
+            ArrayList<Automationrule> automationRules = getAutomationRules(theDeviceInfo.theDevice.getId(), theIOEvent.getIoName());
             
-            theDeviceManager.updateDeviceIOState(theDeviceInfo);
+            for(Automationrule rule : automationRules) {
+                handleRule(rule, theIOEvent.getIoValue());
+            }
         }
     }
     

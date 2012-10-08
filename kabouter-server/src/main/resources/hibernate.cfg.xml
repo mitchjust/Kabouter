@@ -8,7 +8,7 @@
         <property name="hibernate.connection.username">kabouter</property>
         <property name="hibernate.connection.password">kabouter</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.show_sql">true</property>
         <property name="hibernate.jdbc.batch_size">20</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
@@ -21,6 +21,7 @@
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Device.hbm.xml"/>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/DeviceTemplate.hbm.xml"/>
         <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Powerlog.hbm.xml"/>
+        <mapping resource="com/unicornlabs/kabouter/historian/data_objects/Automationrule.hbm.xml"/>
     
    
     </session-factory>
