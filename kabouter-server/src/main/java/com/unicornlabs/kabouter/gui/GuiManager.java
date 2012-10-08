@@ -22,6 +22,7 @@ import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
+import com.unicornlabs.kabouter.gui.automation.AutomationPanel;
 import com.unicornlabs.kabouter.gui.debug.DebugPanel;
 import com.unicornlabs.kabouter.gui.devices.DevicesPanel;
 import com.unicornlabs.kabouter.gui.power.PowerPanel;
@@ -54,6 +55,7 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
     private MainPanel myMainPanel;
     private DevicesPanel myDevicesPanel;
     private PowerPanel myPowerPanel;
+    private AutomationPanel myAutomationPanel;
     private DebugPanel myDebugPanel;
 
     /**
@@ -75,6 +77,8 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
         myDevicesPanel = new DevicesPanel();
 
         myPowerPanel = new PowerPanel();
+        
+        myAutomationPanel = new AutomationPanel();
 
         myDebugPanel = new DebugPanel();
 
@@ -82,6 +86,7 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
         myMainFrame.addTabbedPanel("Home", myMainPanel);
         myMainFrame.addTabbedPanel("Devices", myDevicesPanel);
         myMainFrame.addTabbedPanel("Power Logs", myPowerPanel);
+        myMainFrame.addTabbedPanel("Automation", myAutomationPanel);
         myMainFrame.addTabbedPanel("Debug", myDebugPanel);
 
     }
