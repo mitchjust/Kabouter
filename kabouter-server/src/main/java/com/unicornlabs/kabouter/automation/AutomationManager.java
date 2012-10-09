@@ -51,20 +51,38 @@ public class AutomationManager implements DeviceEventListener{
     private DeviceManager theDeviceManager;
     private Historian theHistorian;
     
+    /**
+     * Creates Automation Manager and links to relevant objects
+     */
     public AutomationManager() {
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
         theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
 
     }
     
+    /**
+     * Gets all automation rules
+     * @return All automation rules
+     */
     public ArrayList<Automationrule> getAutomationRules() {
         return theHistorian.getAutomationRules();
     }
     
+    /**
+     * Gets all automation rules related to a particular device/io
+     * @param sourceId the Device ID the event originated from
+     * @param sourceIoName the IO Name
+     * @return the relevant automation rules
+     */
     public ArrayList<Automationrule> getAutomationRules(String sourceId, String sourceIoName) {
         return theHistorian.getAutomationRules(sourceId, sourceIoName);
     }
     
+    /**
+     * Checks if the rule is in effect, and if so, acts on it
+     * @param rule the rule to process
+     * @param sourceValue the value to check against
+     */
     public void handleRule(Automationrule rule, double sourceValue) {
         if(rule.getSourceFunction().contentEquals(EQUALS_FUNCTION)) {
             if(rule.getSourceValue() == sourceValue) {
@@ -83,12 +101,22 @@ public class AutomationManager implements DeviceEventListener{
         }
     }
     
+    /**
+     * Sends a device a message setting an io to a value
+     * @param deviceId the device id
+     * @param ioName the io name to set
+     * @param value the value to set it to
+     */
     public void setIOValue(String deviceId, String ioName, double value) {
         LOGGER.log(Level.INFO, "Sending IO Update Message To {0} [{1}]:{2}", new Object[]{deviceId, ioName, value});
         DeviceStatus deviceStatus = theDeviceManager.getDeviceStatus(deviceId);
         deviceStatus.tcpChannel.write(ioName+":"+value);
     }
 
+    /**
+     * Handles Device Events
+     * @param e the event
+     */
     @Override
     public void handleDeviceEvent(DeviceEvent e) {
         if(e.getEventType().equals(DeviceEvent.IO_CHANGE_EVENT)) {

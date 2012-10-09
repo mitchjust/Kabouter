@@ -37,7 +37,7 @@ public class KabouterConstants {
     }
     //App specific constants
     public static final String APP_NAME = "Kabouter Server";
-    public static final String APP_VERSION = "V1.0 SNAPSHOT";
+    public static final String APP_VERSION = "V1.1 SNAPSHOT";
     public static final String FRAME_TITLE = APP_NAME + " " + APP_VERSION;
     //Jar File constants
     public static final String CONFIG_PATH = "/com/unicornlabs/kabouter/config/";
