@@ -42,7 +42,7 @@ public class AutomationManager implements DeviceEventListener{
     private static final String EQUALS_FUNCTION = "EQUALS";
     private static final String MORE_THAN_FUNCTION = "MORE THAN";
     private static final String LESS_THAN_FUNCTION = "LESS THAN";
-    private static final String[] FUNCTIONS = {EQUALS_FUNCTION,MORE_THAN_FUNCTION,LESS_THAN_FUNCTION};
+    public static final String[] FUNCTIONS = {EQUALS_FUNCTION,MORE_THAN_FUNCTION,LESS_THAN_FUNCTION};
     
     static {
         LOGGER.setLevel(Level.ALL);
