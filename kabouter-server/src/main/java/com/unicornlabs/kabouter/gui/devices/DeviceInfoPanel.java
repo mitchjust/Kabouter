@@ -19,6 +19,8 @@ import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.DeviceStatus;
 import com.unicornlabs.kabouter.historian.data_objects.Device;
+import java.awt.Component;
+import java.awt.Container;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -39,6 +41,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         this.myParent = parent;
         initComponents();
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        enableComponents(this, false);
     }
 
     public void setSelectedDevice(DeviceStatus d) {
@@ -54,6 +57,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
             this.deviceTypeField.setText(selectedDeviceStatus.theDevice.getType());
             this.jCheckBox1.setSelected(selectedDeviceStatus.isConnected);
             updateIoNames(selectedDeviceStatus.theDevice);
+            enableComponents(this, true);
         } else {
             this.deviceIdField.setText("");
             this.deviceNameField.setText("");
@@ -62,6 +66,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
             this.jCheckBox1.setSelected(false);
             ioComboBox.removeAllItems();
             ioSetValueField.setText("");
+            enableComponents(this, false);
         }
     }
 
@@ -69,10 +74,20 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         ioComboBox.removeAllItems();
         List<String> iodirections = theDevice.getIodirections();
         List<String> ionames = theDevice.getIonames();
-        
-        for(int i=0;i<ionames.size();i++) {
-            if(iodirections.get(i).contentEquals("output")) {
+
+        for (int i = 0; i < ionames.size(); i++) {
+            if (iodirections.get(i).contentEquals("output")) {
                 ioComboBox.addItem(ionames.get(i));
+            }
+        }
+    }
+
+    public final void enableComponents(Container container, boolean enable) {
+        Component[] components = container.getComponents();
+        for (Component component : components) {
+            component.setEnabled(enable);
+            if (component instanceof Container) {
+                enableComponents((Container) component, enable);
             }
         }
     }
@@ -200,17 +215,19 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        if(!selectedDeviceStatus.isConnected) {
+        if (!selectedDeviceStatus.isConnected) {
             JOptionPane.showMessageDialog(this, "Device must be connected to set I/O State.");
             return;
         }
         try {
             String ioName = (String) ioComboBox.getSelectedItem();
             double value = Double.parseDouble(ioSetValueField.getText());
-            selectedDeviceStatus.tcpChannel.write(ioName+":"+value);
+            selectedDeviceStatus.tcpChannel.write(ioName + ":" + value);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Exception Caught:\n"+e);
+            JOptionPane.showMessageDialog(this, "Exception Caught:\n" + e);
         }
+
+
     }//GEN-LAST:event_updateButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField deviceIdField;
