@@ -18,6 +18,7 @@ package com.unicornlabs.kabouter.gui.devices;
 import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.DeviceStatus;
+import com.unicornlabs.kabouter.historian.data_objects.Device;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -52,7 +53,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
             this.deviceIpField.setText(selectedDeviceStatus.theDevice.getIpaddress());
             this.deviceTypeField.setText(selectedDeviceStatus.theDevice.getType());
             this.jCheckBox1.setSelected(selectedDeviceStatus.isConnected);
-            updateIoNames(selectedDeviceStatus.theDevice.getIonames());
+            updateIoNames(selectedDeviceStatus.theDevice);
         } else {
             this.deviceIdField.setText("");
             this.deviceNameField.setText("");
@@ -64,10 +65,15 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         }
     }
 
-    private void updateIoNames(List<String> ionames) {
+    private void updateIoNames(Device theDevice) {
         ioComboBox.removeAllItems();
-        for (String io : ionames) {
-            ioComboBox.addItem(io);
+        List<String> iodirections = theDevice.getIodirections();
+        List<String> ionames = theDevice.getIonames();
+        
+        for(int i=0;i<ionames.size();i++) {
+            if(iodirections.get(i).contentEquals("output")) {
+                ioComboBox.addItem(ionames.get(i));
+            }
         }
     }
 

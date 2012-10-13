@@ -323,6 +323,7 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
             br = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
         }
         
+        @Override
         public void run() {
             while(alive) {
                 try {
@@ -330,7 +331,7 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
                     parent.output("Message recieved: " + message);
                     String[] split = message.split(":");
                     System.out.println("split[0] = " + split[0]);
-                    if (split[0].contentEquals("\"relay_io")) {
+                    if (split[0].contentEquals("\"relay_out")) {
                         
                         Double d = Double.parseDouble(split[1].substring(0, split[1].length()-1));
                         if(d > 0) {
