@@ -133,7 +133,7 @@ public class KabouterDeviceHandler extends SimpleChannelHandler {
                     DeviceEvent devicePowerEvent = new DeviceEvent(theDeviceManager, DeviceEvent.POWER_LOG_EVENT, deviceStatus, newPowerlog);
                     theDeviceManager.fireDeviceEvent(devicePowerEvent);
                     
-                    IOEvent tempIoEvent = new IOEvent("temp_io", tempValue);
+                    IOEvent tempIoEvent = new IOEvent("temp_in", tempValue);
                     DeviceEvent deviceTempEvent = new DeviceEvent(theDeviceManager, DeviceEvent.IO_CHANGE_EVENT, deviceStatus, tempIoEvent);
                     theDeviceManager.fireDeviceEvent(deviceTempEvent);
                 }

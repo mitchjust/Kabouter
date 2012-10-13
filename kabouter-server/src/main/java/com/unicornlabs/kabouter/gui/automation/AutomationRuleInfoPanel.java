@@ -19,16 +19,23 @@ import com.unicornlabs.kabouter.BusinessObjectManager;
 import com.unicornlabs.kabouter.automation.AutomationManager;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.DeviceStatus;
+import com.unicornlabs.kabouter.historian.Historian;
 import com.unicornlabs.kabouter.historian.data_objects.Automationrule;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ItemEvent;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Mitch
  */
 public class AutomationRuleInfoPanel extends javax.swing.JPanel {
-
+    
     private DeviceManager theDeviceManager;
+    private Historian theHistorian;
+    private Automationrule selectedAutomationRule = null;
 
     /**
      * Creates new form AutomationRuleDetailsPanel
@@ -36,7 +43,9 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
     public AutomationRuleInfoPanel() {
         initComponents();
         theDeviceManager = (DeviceManager) BusinessObjectManager.getBusinessObject(DeviceManager.class.getName());
+        theHistorian = (Historian) BusinessObjectManager.getBusinessObject(Historian.class.getName());
         updateIdComboBoxes();
+        enableComponents(this, false);
     }
 
     /**
@@ -63,6 +72,8 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         functionComboBox = new javax.swing.JComboBox();
         variableTextField = new javax.swing.JTextField();
+        applyButton = new javax.swing.JButton();
+        deleteButton = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Target"));
 
@@ -188,6 +199,20 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        applyButton.setText("Apply");
+        applyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                applyButtonActionPerformed(evt);
+            }
+        });
+
+        deleteButton.setText("Delete");
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -197,7 +222,12 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(applyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,21 +237,79 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(applyButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(deleteButton)
+                .addGap(13, 13, 13))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void sourceIdComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_sourceIdComboBoxItemStateChanged
-        if (evt.getStateChange()==ItemEvent.SELECTED){
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
             updateSourceIoComboBox();
         }
     }//GEN-LAST:event_sourceIdComboBoxItemStateChanged
-
+    
     private void targetIdComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_targetIdComboBoxItemStateChanged
-        if (evt.getStateChange()==ItemEvent.SELECTED){
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
             updateTargetIoComboBox();
         }
     }//GEN-LAST:event_targetIdComboBoxItemStateChanged
+    
+    private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
+        boolean newRule = false;
+        
+        if (selectedAutomationRule == null) {
+            selectedAutomationRule = new Automationrule();
+            newRule = true;
+        }
+        
+        if ((sourceIdComboBox.getSelectedIndex() == -1)
+                || (sourceIoComboBox.getSelectedIndex() == -1)
+                || variableTextField.getText().contentEquals("")
+                || functionComboBox.getSelectedIndex() == -1
+                || targetIdComboBox.getSelectedIndex() == -1
+                || targetIoComboBox.getSelectedIndex() == -1
+                || targetValueTextField.getText().contentEquals("")) {
+            JOptionPane.showMessageDialog(this, "All fields must be filled");
+            return;
+        }
+        
+        try {
+        selectedAutomationRule.setSourceId((String) sourceIdComboBox.getSelectedItem());
+        selectedAutomationRule.setSourceIoName((String) sourceIoComboBox.getSelectedItem());
+        selectedAutomationRule.setSourceValue(Double.parseDouble(variableTextField.getText()));
+        selectedAutomationRule.setSourceFunction((String) functionComboBox.getSelectedItem());
+        selectedAutomationRule.setTargetId((String) targetIdComboBox.getSelectedItem());
+        selectedAutomationRule.setTargetIoName((String) targetIoComboBox.getSelectedItem());
+        selectedAutomationRule.setTargetValue(Double.parseDouble(targetValueTextField.getText()));
+        } catch(NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Number Format Exception");
+            return;
+        }
+        
+        if(newRule) {
+            theHistorian.saveAutomationrule(selectedAutomationRule);
+        } else {
+            theHistorian.updateAutomationrule(selectedAutomationRule);
+        }
+        
+        AutomationPanel parent = (AutomationPanel) this.getParent();
+        parent.refresh();
+        enableComponents(this, false);
+        
+    }//GEN-LAST:event_applyButtonActionPerformed
+    
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        theHistorian.deleteAutomationrule(selectedAutomationRule);
+        AutomationPanel parent = (AutomationPanel) this.getParent();
+        parent.refresh();
+    }//GEN-LAST:event_deleteButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton applyButton;
+    private javax.swing.JButton deleteButton;
     private javax.swing.JComboBox functionComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -240,53 +328,106 @@ public class AutomationRuleInfoPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     void setSelectedRule(Automationrule rule) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        
+        enableComponents(this, true);
+        selectedAutomationRule = rule;
+        
+        if (selectedAutomationRule != null) {
+            sourceIdComboBox.setSelectedItem(rule.getSourceId());
+            sourceIoComboBox.setSelectedItem(rule.getSourceIoName());
+            functionComboBox.setSelectedItem(rule.getSourceFunction());
+            variableTextField.setText(String.valueOf(rule.getSourceValue()));
+            targetIdComboBox.setSelectedItem(rule.getTargetId());
+            targetIoComboBox.setSelectedItem(rule.getTargetIoName());
+            targetValueTextField.setText(String.valueOf(rule.getTargetValue()));
+            deleteButton.setEnabled(true);
+        } else {
+            if (sourceIdComboBox.getItemCount() > 0) {
+                sourceIdComboBox.setSelectedIndex(0);
+            }
+            if (sourceIoComboBox.getItemCount() > 0) {
+                sourceIoComboBox.setSelectedIndex(0);
+            }
+            if (functionComboBox.getItemCount() > 0) {
+                functionComboBox.setSelectedIndex(0);
+            }
+            variableTextField.setText("");
+            if (targetIdComboBox.getItemCount() > 0) {
+                targetIdComboBox.setSelectedIndex(0);
+            }
+            if (targetIoComboBox.getItemCount() > 0) {
+                targetIoComboBox.setSelectedIndex(0);
+            }
+            targetValueTextField.setText("");
+            deleteButton.setEnabled(false);
+        }
+        
     }
-
+    
     public final void updateIdComboBoxes() {
         DeviceStatus[] deviceStatuses = theDeviceManager.getDeviceStatuses();
-
+        
         sourceIdComboBox.removeAllItems();
         targetIdComboBox.removeAllItems();
         functionComboBox.removeAllItems();
-
+        sourceIoComboBox.removeAllItems();
+        targetIoComboBox.removeAllItems();
+        
         for (DeviceStatus d : deviceStatuses) {
             sourceIdComboBox.addItem(d.theDevice.getId());
             targetIdComboBox.addItem(d.theDevice.getId());
         }
-
+        
         for (String function : AutomationManager.FUNCTIONS) {
             functionComboBox.addItem(function);
         }
-
+        
     }
-
+    
     public final void updateSourceIoComboBox() {
-
+        
         sourceIoComboBox.removeAllItems();
-
+        
         String selectedSourceId = (String) sourceIdComboBox.getSelectedItem();
-
+        
         System.out.println("selectedSourceId = " + selectedSourceId);
-
+        
         DeviceStatus sourceStatus = theDeviceManager.getDeviceStatus(selectedSourceId);
-
-        for (String ioName : sourceStatus.theDevice.getIonames()) {
-            sourceIoComboBox.addItem(ioName);
+        List<String> ionames = sourceStatus.theDevice.getIonames();
+        List<String> iodirections = sourceStatus.theDevice.getIodirections();
+        
+        for (int i = 0; i < ionames.size(); i++) {
+            if (iodirections.get(i).contentEquals("input")) {
+                sourceIoComboBox.addItem(ionames.get(i));
+            }
         }
     }
-
+    
     public final void updateTargetIoComboBox() {
         targetIoComboBox.removeAllItems();
-
+        
         String selectedTargetId = (String) targetIdComboBox.getSelectedItem();
-
+        
         System.out.println("selectedTargetId = " + selectedTargetId);
-
+        
         DeviceStatus targetStatus = theDeviceManager.getDeviceStatus(selectedTargetId);
-
-        for (String ioName : targetStatus.theDevice.getIonames()) {
-            targetIoComboBox.addItem(ioName);
+        List<String> ionames = targetStatus.theDevice.getIonames();
+        List<String> iodirections = targetStatus.theDevice.getIodirections();
+        
+        for (int i = 0; i < ionames.size(); i++) {
+            if (iodirections.get(i).contentEquals("output")) {
+                targetIoComboBox.addItem(ionames.get(i));
+            }
+        }
+    }
+    
+    public final void enableComponents(Container container, boolean enable) {
+        Component[] components = container.getComponents();
+        for (Component component : components) {
+            component.setEnabled(enable);
+            if (component instanceof Container) {
+                enableComponents((Container) component, enable);
+            }
         }
     }
 }

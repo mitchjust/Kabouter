@@ -27,9 +27,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Settings;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.impl.SessionFactoryImpl;
 
 /**
@@ -476,6 +478,40 @@ public class Historian {
         session.getTransaction().commit();
         session.close();
         return (ArrayList<Automationrule>) result;
+    }
+
+    public void saveAutomationrule(Automationrule selectedAutomationRule) {
+        selectedAutomationRule.setId(getMaxAutomationRuleId() + 1);
+        
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.save(selectedAutomationRule);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public void updateAutomationrule(Automationrule selectedAutomationRule) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.update(selectedAutomationRule);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    public void deleteAutomationrule(Automationrule selectedAutomationRule) {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        session.delete(selectedAutomationRule);
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public int getMaxAutomationRuleId() {
+        Session session = SESSIONFACTORY.openSession();
+        session.beginTransaction();
+        List list = session.createSQLQuery("select max(id) from kabouterserver.automationrule").list();
+        Integer max = (Integer) list.get(0);
+        return max;
     }
     
     

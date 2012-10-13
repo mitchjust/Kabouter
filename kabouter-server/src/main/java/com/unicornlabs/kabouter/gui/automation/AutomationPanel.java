@@ -86,4 +86,8 @@ public class AutomationPanel extends javax.swing.JPanel  implements ListSelectio
             automationRuleInfoPanel.setSelectedRule(rule);
         }
     }
+
+    void refresh() {
+        automationRuleTable.updateTableData();
+    }
 }

@@ -88,6 +88,8 @@ public class AutomationRuleTable extends JTable{
                 rule.getTargetValue()
             });
         }
+        
+        myModel.addRow(new Object[]{"<Insert New Rule>",null,null,null,null,null,null});
     }
     
     public Automationrule getSelectedRule() {
@@ -95,6 +97,11 @@ public class AutomationRuleTable extends JTable{
         
         if(leadSelectionIndex == -1) {
             //Table is updating
+            return null;
+        }
+        
+        if(leadSelectionIndex >= automationRules.size()) {
+            //The insert rule row is selected
             return null;
         }
         
