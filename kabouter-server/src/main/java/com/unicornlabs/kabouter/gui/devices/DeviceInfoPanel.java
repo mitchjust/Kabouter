@@ -49,6 +49,12 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         updateFields();
     }
 
+    public DeviceStatus getSelectedDeviceStatus() {
+        return selectedDeviceStatus;
+    }
+    
+    
+
     public void updateFields() {
         if (selectedDeviceStatus != null) {
             this.deviceIdField.setText(selectedDeviceStatus.theDevice.getId());
