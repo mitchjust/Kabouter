@@ -21,14 +21,15 @@ import java.io.Serializable;
  *
  * @author Mitch
  */
-public class ClientMessage implements Serializable{
-    
-    public String messageType;
-    public Object data;
+public class IOUpdate implements Serializable {
 
-    public ClientMessage(String messageType, Object data) {
-        this.messageType = messageType;
-        this.data = data;
+    public String deviceId;
+    public String ioName;
+    public float value;
+
+    @Override
+    public String toString() {
+        return "IOUpdate [deviceId=" + deviceId + ", ioName=" + ioName
+                + ", value=" + value + "]";
     }
-
 }

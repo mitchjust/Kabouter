@@ -51,6 +51,8 @@ public class JSONEncoder extends OneToOneEncoder {
     @Override
     protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
         String jsonString = JSONUtils.ToJSON(o);
+        
+        System.out.println("jsonString = " + jsonString);
 
         return jsonString;
     }

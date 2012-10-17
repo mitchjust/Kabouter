@@ -16,19 +16,14 @@
 package com.unicornlabs.kabouter.clients.messaging;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
  * @author Mitch
  */
-public class ClientMessage implements Serializable{
-    
-    public String messageType;
-    public Object data;
-
-    public ClientMessage(String messageType, Object data) {
-        this.messageType = messageType;
-        this.data = data;
-    }
-
+public class ClientDeviceObject implements Serializable{
+    public String deviceId;
+    public ArrayList<String> deviceIoNames;
+    public ArrayList<String> deviceIoTypes;
 }

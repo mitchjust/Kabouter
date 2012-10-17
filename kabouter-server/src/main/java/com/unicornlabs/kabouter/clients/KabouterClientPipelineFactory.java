@@ -18,6 +18,7 @@
 package com.unicornlabs.kabouter.clients;
 
 import com.unicornlabs.kabouter.clients.messaging.ClientMessage;
+import com.unicornlabs.kabouter.clients.messaging.IOUpdate;
 import com.unicornlabs.kabouter.net.JSONDecoder;
 import com.unicornlabs.kabouter.net.JSONEncoder;
 import java.util.logging.Level;
@@ -27,6 +28,9 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
+import org.jboss.netty.handler.codec.serialization.ClassResolvers;
+import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 
@@ -64,10 +68,14 @@ public class KabouterClientPipelineFactory implements
         myPipeline.addLast("stringencoder", new StringEncoder());
 
         //Attach JSON en/decoders
-        myPipeline.addLast("jsondecoder", new JSONDecoder<ClientMessage>(ClientMessage.class));
+        myPipeline.addLast("jsondecoder", new JSONDecoder<IOUpdate>(IOUpdate.class));
         myPipeline.addLast("jsonencoder", new JSONEncoder());
 
         //Attach a Kabouter Client Handler at the end of the stream
+        
+//        myPipeline.addLast("objectencoder", new ObjectEncoder());
+//        myPipeline.addLast("objectdecoder", new ObjectDecoder(ClassResolvers.cacheDisabled(getClass().getClassLoader())));
+        
         myPipeline.addLast("handler", new KabouterClientHandler());
 
         return myPipeline;

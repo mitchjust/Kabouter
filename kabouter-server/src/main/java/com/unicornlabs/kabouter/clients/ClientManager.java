@@ -36,7 +36,7 @@ import org.jboss.netty.channel.Channel;
  *
  * Description: Handles information requests from clients
  */
-public class ClientManager implements DeviceEventListener{
+public class ClientManager{
 
     private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName());
 
@@ -73,18 +73,6 @@ public class ClientManager implements DeviceEventListener{
         myTCPChannelServer.run();
     }
 
-    @Override
-    public void handleDeviceEvent(DeviceEvent e) {
-        DeviceStatus deviceStatus = e.getOriginDevice();
-        
-        for(KabouterClient client : myClients) {
-            if(client.deviceOfInterest.contentEquals(deviceStatus.theDevice.getId())) {
-                ClientMessage message = new ClientMessage(ClientMessage.DEVICE_EVENT_MESSAGE, e);
-                client.clientChannel.write(message);
-            }
-        }
-    }
-
     public KabouterClient clientConnected(Channel channel) {
         KabouterClient newClient = new KabouterClient(channel);
         myClients.add(newClient);
@@ -94,7 +82,7 @@ public class ClientManager implements DeviceEventListener{
     public void clientDisconnected(KabouterClient client) {
         boolean success = myClients.remove(client);
         if(!success) {
-            LOGGER.severe("Removing unknown Client: " + client.clientChannel.getRemoteAddress());
+            LOGGER.log(Level.SEVERE, "Removing unknown Client: {0}", client.clientChannel.getRemoteAddress());
         }
     }
     
