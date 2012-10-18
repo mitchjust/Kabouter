@@ -220,7 +220,7 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
             idField.setEnabled(false);
             powerField.setEnabled(true);
             runButton.setEnabled(true);
-            
+
             myMessageReader = new MessageReader(mySocket, this);
             myMessageReader.start();
 
@@ -251,7 +251,7 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
 
             myPowerGenerator = new PowerGenerator(powerLevel, mySocket, this);
             myPowerGenerator.start();
-            
+
             updateButton.setEnabled(true);
 
         } else {
@@ -309,8 +309,9 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
         outputArea.append(text + "\n");
         outputArea.setCaretPosition(outputArea.getDocument().getLength());
     }
-    
+
     private static class MessageReader extends Thread {
+
         private Socket mySocket;
         private TestPowerDeviceGui parent;
         private boolean alive;
@@ -322,19 +323,19 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
             this.alive = true;
             br = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
         }
-        
+
         @Override
         public void run() {
-            while(alive) {
+            while (alive) {
                 try {
                     String message = br.readLine();
                     parent.output("Message recieved: " + message);
                     String[] split = message.split(":");
                     System.out.println("split[0] = " + split[0]);
                     if (split[0].contentEquals("\"relay_out")) {
-                        
-                        Double d = Double.parseDouble(split[1].substring(0, split[1].length()-1));
-                        if(d > 0) {
+
+                        Double d = Double.parseDouble(split[1].substring(0, split[1].length() - 1));
+                        if (d > 0) {
                             parent.jCheckBox1.setSelected(true);
                         } else {
                             parent.jCheckBox1.setSelected(false);
@@ -345,8 +346,6 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
                 }
             }
         }
-        
-        
     }
 
     private static class PowerGenerator extends Thread {
@@ -379,10 +378,15 @@ public class TestPowerDeviceGui extends javax.swing.JFrame {
         public void run() {
             while (alive) {
                 try {
-                    float value = r.nextFloat() * (baseLevel / 10) + baseLevel;
+
+                    float value = 0;
+
+                    if (parent.jCheckBox1.isSelected()) {
+                        value = r.nextFloat() * (baseLevel / 10) + baseLevel;
+                    }
                     float temp = parent.tempSlider.getValue();
                     DeviceServerMessage newMessage = new DeviceServerMessage();
-                    newMessage.data = value+":"+temp;
+                    newMessage.data = value + ":" + temp;
                     newMessage.messageType = DeviceServerMessage.POWER_LOG;
 
                     String jsonString = JSONUtils.ToJSON(newMessage);
