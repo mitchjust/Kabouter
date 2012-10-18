@@ -511,6 +511,9 @@ public class Historian {
         session.beginTransaction();
         List list = session.createSQLQuery("select max(id) from kabouterserver.automationrule").list();
         Integer max = (Integer) list.get(0);
+        if(max == null) {
+            return 0;
+        }
         return max;
     }
     

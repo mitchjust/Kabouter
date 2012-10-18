@@ -22,6 +22,7 @@ import com.unicornlabs.kabouter.config.KabouterConstants;
 import com.unicornlabs.kabouter.devices.DeviceManager;
 import com.unicornlabs.kabouter.devices.events.DeviceEvent;
 import com.unicornlabs.kabouter.devices.events.DeviceEventListener;
+import com.unicornlabs.kabouter.devices.events.IOEvent;
 import com.unicornlabs.kabouter.gui.automation.AutomationPanel;
 import com.unicornlabs.kabouter.gui.debug.DebugPanel;
 import com.unicornlabs.kabouter.gui.devices.DevicesPanel;
@@ -155,6 +156,12 @@ public class GuiManager implements ChangeListener, DeviceEventListener {
                         myDevicesPanel.devicesTable.updateTableData();
                     } else if (eventType.equals(DeviceEvent.DEVICE_DISCONNECTION_EVENT)) {
                         myDevicesPanel.devicesTable.updateTableData();
+                    } else if (eventType.equals(DeviceEvent.IO_CHANGE_EVENT)) {
+                        if(e.getOriginDevice() == myDevicesPanel.getDeviceInfoPanel1().getSelectedDeviceStatus()) {
+
+                            IOEvent event = (IOEvent) e.getAttachment();
+                            myDevicesPanel.getDeviceInfoPanel1().updateInIo(event.getIoValue());
+                        }
                     }
                 } else if (currentTab == myPowerPanel) {
                     //Power Panel Handlers

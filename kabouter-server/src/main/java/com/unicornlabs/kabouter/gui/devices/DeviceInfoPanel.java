@@ -63,6 +63,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
             this.deviceTypeField.setText(selectedDeviceStatus.theDevice.getType());
             this.jCheckBox1.setSelected(selectedDeviceStatus.isConnected);
             updateIoNames(selectedDeviceStatus.theDevice);
+            updateInIo(0);
             enableComponents(this, true);
         } else {
             this.deviceIdField.setText("");
@@ -72,6 +73,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
             this.jCheckBox1.setSelected(false);
             ioComboBox.removeAllItems();
             ioSetValueField.setText("");
+            inIoNameLabel.setText("");
             enableComponents(this, false);
         }
     }
@@ -121,6 +123,8 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
         ioSetValueField = new javax.swing.JTextField();
         updateButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        inIoNameLabel = new javax.swing.JLabel();
 
         jLabel4.setText("Device IP:");
 
@@ -155,6 +159,10 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Set I/O:");
 
+        jLabel7.setText("Input I/O: ");
+
+        inIoNameLabel.setText(" ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -169,7 +177,6 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(deviceTypeField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(deviceIpField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jCheckBox1)
                     .addGroup(layout.createSequentialGroup()
@@ -177,16 +184,25 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(87, 87, 87))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(deviceIdField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(deviceTypeField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel7))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(deviceIdField, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addComponent(ioComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(ioSetValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(updateButton))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(ioComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(ioSetValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(updateButton)))
+                            .addComponent(inIoNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -204,10 +220,17 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(deviceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(updateButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(deviceTypeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(deviceTypeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(inIoNameLabel))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -240,6 +263,7 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField deviceIpField;
     private javax.swing.JTextField deviceNameField;
     private javax.swing.JTextField deviceTypeField;
+    private javax.swing.JLabel inIoNameLabel;
     private javax.swing.JComboBox ioComboBox;
     private javax.swing.JTextField ioSetValueField;
     private javax.swing.JCheckBox jCheckBox1;
@@ -249,6 +273,20 @@ public class DeviceInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
+
+    public void updateInIo(double ioValue) {
+        int inputIndex;
+        if((inputIndex = selectedDeviceStatus.theDevice.getIodirections().indexOf("input")) != -1)
+        {
+            String inputName = selectedDeviceStatus.theDevice.getIonames().get(inputIndex);
+            this.inIoNameLabel.setText(inputName + " - " + ioValue);
+        }
+        else
+        {
+            this.inIoNameLabel.setText("");
+        }
+    }
 }

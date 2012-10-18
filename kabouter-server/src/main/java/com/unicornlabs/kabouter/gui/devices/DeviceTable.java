@@ -79,7 +79,7 @@ public class DeviceTable extends JTable {
     public DeviceStatus getSelectedDevice() {
         int leadSelectionIndex = this.getSelectionModel().getLeadSelectionIndex();
         
-        if(leadSelectionIndex == -1) {
+        if(leadSelectionIndex == -1 || leadSelectionIndex >= deviceStatuses.length) {
             //Table is updating
             return null;
         }

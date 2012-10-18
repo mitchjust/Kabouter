@@ -99,6 +99,12 @@ public class DevicesPanel extends javax.swing.JPanel implements ListSelectionLis
         }
     }
 
+    public DeviceInfoPanel getDeviceInfoPanel1() {
+        return deviceInfoPanel1;
+    }
+    
+    
+
     public DeviceStatus getSelectedDeviceStatus() {
         return deviceInfoPanel1.getSelectedDeviceStatus();
     }
